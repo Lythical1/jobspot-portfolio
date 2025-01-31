@@ -1,0 +1,42 @@
+services:
+  php:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./www:/var/www/html
+      - ./includes:/var/www/html/includes
+      - ./assets:/var/www/html/assets
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: jobspot
+      MYSQL_USER: bit_academy
+      MYSQL_PASSWORD: bit_academy
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/:/docker-entrypoint-initdb.d/
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: rootpassword
+      PMA_USER: bit_academy
+      PMA_PASSWORD: bit_academy
+      PMA_ARBITRARY: 1
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
