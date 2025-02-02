@@ -1,6 +1,5 @@
 <?php
-
-    require_once 'app\core\functions.php';
+    require_once '../core/functions.php';
     
     $database = new Database();
 ?>
@@ -14,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <?php include 'app\core\navbar.php'; ?>
+    <?php include '../core/navbar.php'; ?>
+
 </body>
 </html>

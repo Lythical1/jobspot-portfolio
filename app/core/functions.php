@@ -4,7 +4,7 @@ class Database
 {
     public function __construct()
     {
-        $this->connectDb();
+        
     }
     private static function connectDb()
     {
@@ -17,6 +17,7 @@ class Database
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         } catch (PDOException $e) {
+            echo "Please contact the administrator. <br>";
             die("Connection failed: " . $e->getMessage());
         }
     }
@@ -24,7 +25,11 @@ class Database
     public function getJobs()
     {
         $pdo = $this->connectDb();
-        $stmt = $pdo->prepare("SELECT * FROM jobs");
+        $stmt = $pdo->prepare("
+            SELECT jobs.*, companies.name as company 
+            FROM jobs 
+            LEFT JOIN companies ON jobs.company_id = companies.id
+        ");
         $stmt->execute();
         return $stmt->fetchAll();
     }
