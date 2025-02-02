@@ -3,7 +3,6 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    image: jobspot-portfolio-php:latest
     volumes:
       - ./app/web:/var/www/html
       - ./app/core:/var/www/core
@@ -11,8 +10,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
   mysql:
     image: mysql:8.0
@@ -26,11 +24,6 @@ services:
       - ./database/:/docker-entrypoint-initdb.d/
     ports:
       - "3306:3306"
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -43,8 +36,7 @@ services:
       PMA_PASSWORD: bit_academy
       PMA_ARBITRARY: 1
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
 volumes:
   mysql_data:
