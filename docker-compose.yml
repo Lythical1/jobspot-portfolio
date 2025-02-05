@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./www:/var/www/html
-      - ./includes:/var/www/html/includes
-      - ./assets:/var/www/html/assets
+      - ./app/web:/var/www/html
+      - ./app/core:/var/www/core
+      - ./app/assets:/var/www/assets
     ports:
       - "8080:80"
     depends_on:

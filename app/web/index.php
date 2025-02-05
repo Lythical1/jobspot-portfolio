@@ -1,10 +1,8 @@
 <?php
-
-    require_once 'includes/functions.php';
+    require_once '../core/functions.php';
     
     $database = new Database();
 ?>
-    
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <?php include 'includes/navbar.php'; ?>
+    <?php include '../core/navbar.php'; ?>
+
 </body>
 </html>
