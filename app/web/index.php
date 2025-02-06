@@ -1,5 +1,5 @@
 <?php
-    require_once '../core/functions.php';
+    require_once '../core/database.php';
     
     $database = new Database();
 ?>
