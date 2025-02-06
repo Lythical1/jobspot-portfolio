@@ -4,7 +4,6 @@ class Database
 {
     public function __construct()
     {
-        
     }
     private static function connectDb()
     {
