@@ -59,7 +59,8 @@ INSERT INTO categories (name, description) VALUES
 
 -- Insert sample user (password: test123)
 INSERT INTO users (username, email, password, role) VALUES
-('testemployer', 'test@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'employer');
+('testemployer', 'test@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'employer'),
+('admin', 'admin@example.com', '$2y$10$c7W8MQIvF95ErrIhNVjREODQEDY1OwlYQVRiEsnrgH1574yUTDujm', 'admin');
 
 -- Insert sample company
 INSERT INTO companies (name, description, location, website, user_id) VALUES

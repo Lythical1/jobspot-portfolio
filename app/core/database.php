@@ -5,7 +5,7 @@ class Database
     public function __construct()
     {
     }
-    private static function connectDb()
+    public static function connectDb()
     {
         try {
             $pdo = new PDO(
@@ -23,7 +23,7 @@ class Database
 
     public function getJobs()
     {
-        $pdo = $this->connectDb();
+        $pdo = self::connectDb();
         $stmt = $pdo->prepare("
             SELECT jobs.*, companies.name as company 
             FROM jobs 
@@ -35,7 +35,7 @@ class Database
     
     public function getCompanies()
     {
-        $pdo = $this->connectDb();
+        $pdo = self::connectDb();
         $stmt = $pdo->prepare("SELECT * FROM companies");
         $stmt->execute();
         return $stmt->fetchAll();
