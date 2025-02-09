@@ -1,9 +1,4 @@
-<script src="https://cdn.tailwindcss.com">
-function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenu.classList.toggle('hidden');
-}
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <nav class="bg-gray-800">
     <div class="max-w-full mx-auto px-8">
         <div class="flex items-center justify-between h-16">
@@ -31,7 +26,7 @@ function toggleMobileMenu() {
             <div class="w-32 hidden md:flex items-center justify-end space-x-4 flex-none">
                 <a href="/register"
                     class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Register</a>
-                <a href="/login"
+                <a href="/user/login"
                     class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">Login</a>
             </div>
 
@@ -62,9 +57,15 @@ function toggleMobileMenu() {
                     class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contact</a>
                 <a href="/register"
                     class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Register</a>
-                <a href="/login"
+                <a href="/user/login"
                     class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Login</a>
             </div>
         </div>
     </div>
 </nav>
+<script>
+    function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenu.classList.toggle('hidden');
+}
+</script>
