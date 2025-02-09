@@ -2,7 +2,7 @@
 
 require_once 'database.php';
 
-class User
+class Users
 {
     public function __construct()
     {
@@ -44,5 +44,20 @@ class User
         $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
+    }
+
+    public function LoginUser($email, $password)
+    {
+        $pdo = Database::connectDb();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+        }
+        
+        return false;
     }
 }

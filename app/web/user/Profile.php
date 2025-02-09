@@ -1,10 +1,10 @@
 <?php
 
 require_once '../../core/users.php';
-$user = new User();
+$user = new Users();
 
-if (isset($_COOKIE['id'])) {
-    $id = $_COOKIE['id'];
+if (isset($_SESSION['id'])) {
+    $id = $_SESSION['id'];
     $user = $user->getUser($id);
     
     if ($user) {
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     
     $user->updateUser($id, $name, $email, $password);
-    header('Location: /User/Profile.php');
+    header('Location: /User/Profile');
     exit;
 }
 

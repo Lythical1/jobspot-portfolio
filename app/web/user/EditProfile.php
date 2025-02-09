@@ -1,10 +1,10 @@
 <?php
 
-require_once '../../core/users.php';
-$user = new User();
+require_once '../../core/users';
+$user = new Users();
 
-if (isset($_COOKIE['id'])) {
-    $id = $_COOKIE['id'];
+if (isset($_SESSION['id'])) {
+    $id = $_SESSION['id'];
     $user = $user->getUser($id);
     
     if ($user) {
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     
     $user->updateUser($id, $name, $email, $password);
-    header('Location: /User/Profile.php');
+    header('Location: /User/Profile');
     exit;
 }
     
@@ -35,11 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Edit Profile</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <?php include '../../core/navbar.php'; ?>
+    <?php include '../../core/navbar'; ?>
     <div class="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow">
         <h1 class="text-2xl font-bold mb-6 text-center">Edit Profile</h1>
         <form method="post">
