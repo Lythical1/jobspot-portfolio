@@ -5,8 +5,6 @@ if (!isset($_SESSION['user_role'])) {
     exit();
 }
 
-define('DASHBOARD_ROUTED', true);
-
 $role = $_SESSION['user_role'];
 
 if ($role === 'admin') {
