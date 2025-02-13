@@ -16,7 +16,8 @@ if (isset($_POST['submit'])) {
             session_start();
             $_SESSION['user_id'] = $loginResult['id'];
             $_SESSION['user_email'] = $loginResult['email'];
-            header('Location: dashboard');
+            $_SESSION['user_role'] = $loginResult['role'];
+            header('Location: ../dashboard');
             exit();
         } else {
             $error = "Invalid email or password";

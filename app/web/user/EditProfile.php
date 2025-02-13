@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_role'])) {
+    header('Location: /app/web/user/login.php');
+    exit();
+}
 
 require_once '../../core/users';
 $user = new Users();
