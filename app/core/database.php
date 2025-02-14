@@ -40,4 +40,22 @@ class Database
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function filterJobs($filters)
+    {
+        $pdo = self::connectDb();
+        // Check if $filters is an array
+        if (!is_array($filters)) {
+            $filters = [$filters];
+        }
+        // Create a string of placeholders for each filter value
+        $filterPlaceholders = implode(',', array_fill(0, count($filters), '?'));
+        $stmt = $pdo->prepare("SELECT * FROM jobs WHERE category_id IN ($filterPlaceholders)");
+        
+        foreach ($filters as $index => $filter) {
+            $stmt->bindValue($index + 1, $filter, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }
