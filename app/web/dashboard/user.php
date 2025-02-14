@@ -1,6 +1,6 @@
 <?php
 
-if ($_SESSION['user_role'] == 'employer') {
+if ($_SESSION['user_role'] == 'employer' || !defined('DASHBOARD_ROUTED')) {
     header('Location: /dashboard');
     exit();
 }

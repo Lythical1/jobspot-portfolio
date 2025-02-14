@@ -46,7 +46,7 @@ class Users
         $stmt->execute();
     }
 
-    public function LoginUser($email, $password)
+    public function loginUser($email, $password)
     {
         $pdo = Database::connectDb();
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");

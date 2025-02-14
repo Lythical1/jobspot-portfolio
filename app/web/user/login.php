@@ -55,14 +55,14 @@ if (isset($_POST['submit'])) {
                         Submit
                     </button>
                 </div>
-                <?php if (!empty($error)): ?>
-                    <div class="text-gray-600 text-sm text-center">
-                        <div class="text-red-500"><?= htmlspecialchars($error) ?></div>
-                    </div>
-                    <div class="text-gray-600 text-sm text-center">
-                        <a href="register">Don't have an account? Register here.</a>
-                    </div>
+                <?php if (!empty($error)) : ?>
+                <div class="text-gray-600 text-sm text-center">
+                    <div class="text-red-500"><?= htmlspecialchars($error) ?></div>
+                </div>
                 <?php endif; ?>
+                <div class="text-gray-600 text-sm text-center">
+                    <a href="register">Don't have an account? Register here.</a>
+                </div>
                 <div class="text-gray-600 text-sm text-center">
                     <a href="forgot_password">Forgot your password?</a>
                 </div>

@@ -1,9 +1,11 @@
 <?php
 
-if ($_SESSION['user_role'] !== 'admin') {
+if ($_SESSION['user_role'] !== 'admin' || !defined('DASHBOARD_ROUTED')) {
     header('Location: /dashboard');
     exit();
 }
+
+
 
 ?>
 
