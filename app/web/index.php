@@ -1,7 +1,6 @@
 <?php
-    require_once '../core/database.php';
-    
-    $database = new Database();
+session_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -10,10 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobSpot - Home Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <?php include '../core/navbar.php'; ?>
-
 </body>
 </html>
