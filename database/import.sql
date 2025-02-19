@@ -121,18 +121,5 @@ INSERT INTO saved_jobs (id, user_id, job_id) VALUES
 (UUID(), (SELECT id FROM users WHERE email = 'testuser@example.com'), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'));
 
 -- Insert sample interview
-(UUID(), 'Laravel', 'PHP web application framework');
-
--- Insert sample job_skills
-INSERT INTO job_skills (job_id, skill_id) VALUES
-((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'PHP')),
-((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'MySQL')),
-((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'Laravel'));
-
--- Insert sample saved_jobs
-INSERT INTO saved_jobs (id, user_id, job_id) VALUES
-(UUID(), (SELECT id FROM users WHERE email = 'testuser@example.com'), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'));
-
--- Insert sample interview
 INSERT INTO interviews (id, job_id, user_id, scheduled_at) VALUES
 (UUID(), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM users WHERE email = 'testuser@example.com'), DATE_ADD(NOW(), INTERVAL 2 DAY));
