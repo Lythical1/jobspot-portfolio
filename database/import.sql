@@ -59,6 +59,37 @@ CREATE TABLE applications (
     FOREIGN KEY (job_id) REFERENCES jobs(id)
 );
 
+-- Create saved_jobs table for users to bookmark jobs
+CREATE TABLE saved_jobs (
+    id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    user_id CHAR(36) NOT NULL,
+    job_id CHAR(36) NOT NULL,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);
+
+-- Create interviews table to manage interview scheduling
+CREATE TABLE interviews (
+    id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    job_id CHAR(36) NOT NULL,
+    user_id CHAR(36) NOT NULL,
+    scheduled_at DATETIME NOT NULL,
+    status ENUM('scheduled','completed','cancelled') DEFAULT 'scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Add new table for skill tags
+CREATE TABLE skill_tags (
+    id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    job_id CHAR(36) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    FOREIGN KEY (job_id) REFERENCES jobs(id)
+);
+
 -- Insert sample categories
 INSERT INTO categories (id, name, description) VALUES
 (UUID(), 'Development', 'Software development and programming positions'),
@@ -78,3 +109,30 @@ INSERT INTO companies (id, name, description, location, website, user_id) VALUES
 -- Insert sample job
 INSERT INTO jobs (id, title, description, requirements, salary_range, location, company_id, category_id) VALUES
 (UUID(), 'Senior PHP Developer', 'We are looking for an experienced PHP developer to join our team.', 'Min 5 years experience with PHP\nKnowledge of MySQL\nExperience with MVC frameworks', '€4000-€5500', 'Amsterdam', (SELECT id FROM companies WHERE name = 'Tech Corp'), (SELECT id FROM categories WHERE name = 'Development'));
+
+-- Insert sample skill tags for job 'Senior PHP Developer'
+INSERT INTO skill_tags (id, job_id, name, description) VALUES
+(UUID(), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), 'PHP', 'Hypertext Preprocessor'),
+(UUID(), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), 'MySQL', 'Open-source relational database management system'),
+(UUID(), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), 'Laravel', 'PHP web application framework');
+
+-- Insert sample saved_jobs
+INSERT INTO saved_jobs (id, user_id, job_id) VALUES
+(UUID(), (SELECT id FROM users WHERE email = 'testuser@example.com'), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'));
+
+-- Insert sample interview
+(UUID(), 'Laravel', 'PHP web application framework');
+
+-- Insert sample job_skills
+INSERT INTO job_skills (job_id, skill_id) VALUES
+((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'PHP')),
+((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'MySQL')),
+((SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM skills WHERE name = 'Laravel'));
+
+-- Insert sample saved_jobs
+INSERT INTO saved_jobs (id, user_id, job_id) VALUES
+(UUID(), (SELECT id FROM users WHERE email = 'testuser@example.com'), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'));
+
+-- Insert sample interview
+INSERT INTO interviews (id, job_id, user_id, scheduled_at) VALUES
+(UUID(), (SELECT id FROM jobs WHERE title = 'Senior PHP Developer'), (SELECT id FROM users WHERE email = 'testuser@example.com'), DATE_ADD(NOW(), INTERVAL 2 DAY));
