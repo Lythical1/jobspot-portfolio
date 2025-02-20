@@ -28,6 +28,13 @@ CREATE TABLE categories (
     description VARCHAR(255)
 );
 
+-- Create skills table to store skill details
+CREATE TABLE skills (
+    id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
 -- JOBS table with UUID for primary key and FKs
 CREATE TABLE jobs (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
@@ -39,14 +46,13 @@ CREATE TABLE jobs (
     location VARCHAR(100),
     company_id CHAR(36),
     category_id CHAR(36),
-    skills TEXT,
     status ENUM('open', 'closed') DEFAULT 'open',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (skills) REFERENCES skills(id),
     FOREIGN KEY (company_id) REFERENCES companies(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+-- JOB SEARCHERS table with UUID for primary key and FKs
 CREATE TABLE job_searchers (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
     user_id CHAR(36) NOT NULL,
@@ -54,11 +60,27 @@ CREATE TABLE job_searchers (
     work_hours VARCHAR(50),
     salary_range VARCHAR(50) DEFAULT 'Negotiable',
     location VARCHAR(100),
-    skills TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (skills) REFERENCES skills(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Pivot table to associate jobs with multiple skills (many-to-many relationship)
+CREATE TABLE job_skills (
+    job_id CHAR(36) NOT NULL,
+    skill_id CHAR(36) NOT NULL,
+    PRIMARY KEY (job_id, skill_id),
+    FOREIGN KEY (job_id) REFERENCES jobs(id),
+    FOREIGN KEY (skill_id) REFERENCES skills(id)
+);
+
+-- Pivot table to associate job searchers with multiple skills (many-to-many relationship)
+CREATE TABLE job_searcher_skills (
+    job_searcher_id CHAR(36) NOT NULL,
+    skill_id CHAR(36) NOT NULL,
+    PRIMARY KEY (job_searcher_id, skill_id),
+    FOREIGN KEY (job_searcher_id) REFERENCES job_searchers(id),
+    FOREIGN KEY (skill_id) REFERENCES skills(id)
 );
 
 -- APPLICATIONS table with UUID for primary key and FKs
@@ -94,22 +116,6 @@ CREATE TABLE interviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (job_id) REFERENCES jobs(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Create skills table to store skill details
-CREATE TABLE skills (
-    id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
-    name VARCHAR(100) NOT NULL,
-    description TEXT
-);
-
--- Create pivot table to associate jobs with skills (many-to-many)
-CREATE TABLE job_skills (
-    job_id CHAR(36) NOT NULL,
-    skill_id CHAR(36) NOT NULL,
-    PRIMARY KEY (job_id, skill_id),
-    FOREIGN KEY (job_id) REFERENCES jobs(id),
-    FOREIGN KEY (skill_id) REFERENCES skills(id)
 );
 
 -- Create a new pivot table to optionally link users with skills (not mandatory)
@@ -155,8 +161,6 @@ VALUES
         'Customer Service',
         'Customer support and service positions'
     );
-
-;
 
 -- Insert sample users
 INSERT INTO
@@ -511,8 +515,7 @@ INSERT INTO
         category_id,
         work_hours,
         salary_range,
-        location,
-        skills
+        location
     )
 VALUES
     (
@@ -535,15 +538,7 @@ VALUES
         ),
         '40 hours/week',
         '€3500-€5000',
-        'Amsterdam',
-        (
-            SELECT
-                id
-            FROM
-                skills
-            WHERE
-                name = 'PHP'
-        )
+        'Amsterdam'
     ),
     (
         UUID(),
@@ -565,15 +560,7 @@ VALUES
         ),
         'Part-time',
         '€2500-€3500',
-        'Rotterdam',
-        (
-            SELECT
-                id
-            FROM
-                skills
-            WHERE
-                name = 'PHP'
-        )
+        'Rotterdam'
     );
 
 -- Insert sample applications
