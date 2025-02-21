@@ -7,7 +7,11 @@ class JobSearcher
     public function getSearchers()
     {
         $pdo = Database::connectDb();
-        $stmt = $pdo->prepare("SELECT * FROM job_searchers");
+        $stmt = $pdo->prepare("
+            SELECT js.*, u.first_name, u.last_name 
+            FROM job_searchers js 
+            LEFT JOIN users u ON js.user_id = u.id
+        ");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

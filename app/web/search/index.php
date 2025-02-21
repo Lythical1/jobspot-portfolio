@@ -1,69 +1,78 @@
 <?php
+
 session_start();
-// Capture the query parameter; default to an empty string if not set.
 $searchQuery = $_GET['q'] ?? '';
 $role = $_SESSION['user_role'] ?? 'guest';
 
 require_once '../../core/jobs.php';
-require_once '../../core/job_searchers.php';
 
-$jobRepo = new JobRepository();
-$jobs = $jobRepo->getJobs();
-
-$jobSearcherRepo = new JobSearcher();
-$searchers = $jobSearcherRepo->getSearchers();
-
-if (!empty($searchQuery)) {
-    $filteredSearchers = array_filter($searchers, function ($searcher) use ($searchQuery) {
-        return stripos($searcher['name'], $searchQuery) !== false;
-    });
-} else {
-    $filteredSearchers = $searchers;
+try {
+    $jobRepo = new JobRepository();
+    $results = $jobRepo->searchJobs($searchQuery);
+    $jobs = $results['jobs'];
+    $filteredSearchers = $results['searchers'];
+} catch (Exception $e) {
+    $error = "An error occurred while searching. Please try again later.";
+    $jobs = [];
+    $filteredSearchers = [];
 }
-
-include '../../core/navbar.php';
 
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Search</title>
-    <!-- Tailwind CSS is already included -->
+    <title>Search Results</title>
 </head>
+
 <body class="font-sans">
-    <!-- ...existing navbar code... -->
+    <?php include '../../core/navbar.php'; ?>
     <div class="flex">
-        <div class="w-64 bg-gray-100 p-3">
-            <div class="mb-4">
-                <h3 class="mb-2 text-lg font-bold">Jobs</h3>
-                <div class="max-h-60 overflow-y-auto">
-                    <ul class="space-y-2">
-                        <?php foreach ($jobs as $job) : ?>
-                            <li class="p-2 bg-white border border-gray-200">
-                                <?php echo htmlspecialchars($job['title'] ?? 'Job Title'); ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-            <div>
-                <h3 class="mb-2 text-lg font-bold">Job Seekers</h3>
-                <div class="max-h-60 overflow-y-auto">
-                    <ul class="space-y-2">
-                        <?php foreach ($searchers as $searcher) : ?>
-                            <li class="p-2 bg-white border border-gray-200">
-                                <?php echo htmlspecialchars($searcher['title'] ?? 'Candidate'); ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
         <div class="flex-grow p-5">
-            <!-- ...existing code for processing search query and displaying results... -->
-            <p>Results for: <?php echo htmlspecialchars($searchQuery); ?></p>
+            <h2 class="text-2xl mb-4">Search Results for: <?php echo htmlspecialchars($searchQuery); ?></h2>
+
+            <?php if (isset($error)) : ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (empty($jobs) && empty($filteredSearchers)) : ?>
+            <p class="text-gray-600">No results found for your search.</p>
+            <?php else : ?>
+                <?php if (!empty($jobs)) : ?>
+            <h3 class="text-xl mb-3">Jobs</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <?php foreach ($jobs as $job) : ?>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold"><?= htmlspecialchars($job['title']) ?></h3>
+                    <p class="text-gray-600"><?= htmlspecialchars($job['company'] ?? 'Unknown Company') ?></p>
+                    <p class="mt-2"><?= htmlspecialchars(substr($job['description'], 0, 150)) ?>...</p>
+                </div>
+                    <?php endforeach; ?>
+            </div>
+                <?php endif; ?>
+
+                <?php if (!empty($filteredSearchers)) : ?>
+            <h3 class="text-xl mb-3">Job Seekers</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <?php foreach ($filteredSearchers as $searcher) : ?>
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold"><?= htmlspecialchars($searcher['title']) ?></h3>
+                    <p class="text-gray-600"><?= htmlspecialchars($searcher['location'] ?? 'Location not specified') ?>
+                    </p>
+                    <p class="mt-2">
+                        <?= htmlspecialchars($searcher['work_hours'] ?? 'Hours not specified') ?> •
+                        <?= htmlspecialchars($searcher['salary_range'] ?? 'Salary not specified') ?>
+                    </p>
+                </div>
+                    <?php endforeach; ?>
+            </div>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 </body>
+
 </html>

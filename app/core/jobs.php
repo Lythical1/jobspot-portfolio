@@ -1,6 +1,8 @@
 <?php
 
 require_once 'database.php';
+require_once 'algoSearch.php';
+require_once 'job_searchers.php';
 
 class JobRepository
 {
@@ -30,5 +32,49 @@ class JobRepository
         }
         $stmt->execute();
         return $stmt->fetchAll();
+    }
+
+    public function searchJobs($query)
+    {
+        $results = [
+            'jobs' => [],
+            'searchers' => []
+        ];
+
+        $pdo = Database::connectDb();
+        
+        // Get all jobs
+        $stmt = $pdo->prepare("
+            SELECT jobs.*, companies.name as company 
+            FROM jobs 
+            LEFT JOIN companies ON jobs.company_id = companies.id
+        ");
+        $stmt->execute();
+        $allJobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get all searchers
+        $jobSearcherRepo = new JobSearcher();
+        $allSearchers = $jobSearcherRepo->getSearchers();
+
+        if (empty($query)) {
+            $results['jobs'] = $allJobs;
+            $results['searchers'] = $allSearchers;
+            return $results;
+        }
+
+        // Filter jobs based on similarity
+        $results['jobs'] = array_filter($allJobs, function ($job) use ($query) {
+            return strpos(
+                SearchHelper::normalizeString($job['title']), 
+                SearchHelper::normalizeString($query)
+            ) !== false;
+        });
+
+        // Filter searchers based on similarity
+        $results['searchers'] = array_filter($allSearchers, function ($searcher) use ($query) {
+            return SearchHelper::areSimilar($searcher['title'], $query);
+        });
+
+        return $results;
     }
 }
