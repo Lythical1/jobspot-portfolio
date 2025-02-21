@@ -64,7 +64,7 @@ try {
                     </p>
                     <p class="mt-2">
                         <?= htmlspecialchars($searcher['work_hours'] ?? 'Hours not specified') ?> •
-                        <?= htmlspecialchars($searcher['salary_range'] ?? 'Salary not specified') ?>
+                        <?= htmlspecialchars($searcher['salary_range']) ?>
                     </p>
                 </div>
                     <?php endforeach; ?>

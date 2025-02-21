@@ -57,24 +57,34 @@ class JobRepository
         $allSearchers = $jobSearcherRepo->getSearchers();
 
         if (empty($query)) {
-            $results['jobs'] = $allJobs;
-            $results['searchers'] = $allSearchers;
+            $results['jobs'] = $this->formatSalaryRanges($allJobs);
+            $results['searchers'] = $this->formatSalaryRanges($allSearchers);
             return $results;
         }
 
         // Filter jobs based on similarity
-        $results['jobs'] = array_filter($allJobs, function ($job) use ($query) {
+        $results['jobs'] = $this->formatSalaryRanges(array_filter($allJobs, function ($job) use ($query) {
             return strpos(
                 SearchHelper::normalizeString($job['title']), 
                 SearchHelper::normalizeString($query)
             ) !== false;
-        });
+        }));
 
         // Filter searchers based on similarity
-        $results['searchers'] = array_filter($allSearchers, function ($searcher) use ($query) {
+        $results['searchers'] = $this->formatSalaryRanges(array_filter($allSearchers, function ($searcher) use ($query) {
             return SearchHelper::areSimilar($searcher['title'], $query);
-        });
+        }));
 
         return $results;
+    }
+
+    private function formatSalaryRanges($items)
+    {
+        return array_map(function ($item) {
+            if (isset($item['salary_range'])) {
+                $item['salary_range'] = SearchHelper::formatSalary($item['salary_range']);
+            }
+            return $item;
+        }, $items);
     }
 }

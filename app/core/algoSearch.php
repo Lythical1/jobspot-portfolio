@@ -27,4 +27,17 @@ class SearchHelper
         $distance = levenshtein($str1, $str2);
         return $distance <= $threshold;
     }
+
+    public static function formatSalary($salary)
+    {
+        if (empty($salary)) {
+            return 'Salary not specified';
+        }
+        $salary = str_replace('EUR', '', $salary);
+        $parts = explode('-', $salary);
+        if (count($parts) === 2) {
+            return '€ ' . trim($parts[0]) . '  -  € ' . trim($parts[1]);
+        }
+        return '€ ' . trim($salary);
+    }
 }
