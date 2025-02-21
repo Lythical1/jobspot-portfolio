@@ -41,7 +41,7 @@ CREATE TABLE jobs (
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     requirements TEXT,
-    work_hours VARCHAR(50),
+    work_hours VARCHAR(50) DEFAULT 'Full-time',
     salary_range VARCHAR(50) DEFAULT 'Negotiable',
     location VARCHAR(100),
     company_id CHAR(36),
@@ -55,6 +55,7 @@ CREATE TABLE jobs (
 -- JOB SEARCHERS table with UUID for primary key and FKs
 CREATE TABLE job_searchers (
     id CHAR(36) NOT NULL PRIMARY KEY DEFAULT (UUID()),
+    title VARCHAR(100) NOT NULL,
     user_id CHAR(36) NOT NULL,
     category_id CHAR(36) NOT NULL,
     work_hours VARCHAR(50),
@@ -71,15 +72,6 @@ CREATE TABLE job_skills (
     skill_id CHAR(36) NOT NULL,
     PRIMARY KEY (job_id, skill_id),
     FOREIGN KEY (job_id) REFERENCES jobs(id),
-    FOREIGN KEY (skill_id) REFERENCES skills(id)
-);
-
--- Pivot table to associate job searchers with multiple skills (many-to-many relationship)
-CREATE TABLE job_searcher_skills (
-    job_searcher_id CHAR(36) NOT NULL,
-    skill_id CHAR(36) NOT NULL,
-    PRIMARY KEY (job_searcher_id, skill_id),
-    FOREIGN KEY (job_searcher_id) REFERENCES job_searchers(id),
     FOREIGN KEY (skill_id) REFERENCES skills(id)
 );
 
@@ -143,7 +135,7 @@ VALUES
     ),
     (
         UUID(),
-        'Marketing',
+        'Digital Marketing',
         'Digital marketing and social media positions'
     ),
     (
@@ -332,6 +324,54 @@ VALUES
             WHERE
                 name = 'Design'
         )
+    ),
+    (
+        UUID(),
+        'Data Analyst',
+        'Analyze data and generate actionable insights.',
+        'Proficiency in SQL, Excel, and data visualization tools.',
+        '€3500-€4500',
+        'Amsterdam',
+        (
+            SELECT
+                id
+            FROM
+                companies
+            WHERE
+                name = 'Tech Corp'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                categories
+            WHERE
+                name = 'Management'
+        )
+    ),
+    (
+        UUID(),
+        'Product Manager',
+        'Oversee product development and market strategy.',
+        'Experience in managing product lifecycle and agile methodologies.',
+        '€4500-€6000',
+        'Rotterdam',
+        (
+            SELECT
+                id
+            FROM
+                companies
+            WHERE
+                name = 'Digital Solutions'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                categories
+            WHERE
+                name = 'Management'
+        )
     );
 
 -- Insert sample skills for "Senior PHP Developer"
@@ -511,6 +551,7 @@ VALUES
 INSERT INTO
     job_searchers (
         id,
+        title,
         user_id,
         category_id,
         work_hours,
@@ -520,6 +561,7 @@ INSERT INTO
 VALUES
     (
         UUID(),
+        'Job Seeker Title',
         (
             SELECT
                 id
@@ -542,6 +584,31 @@ VALUES
     ),
     (
         UUID(),
+        'Job Seeker Title 2',
+        (
+            SELECT
+                id
+            FROM
+                users
+            WHERE
+                email = 'testuser@example.com'
+        ),
+        -- changed from 'newuser@example.com'
+        (
+            SELECT
+                id
+            FROM
+                categories
+            WHERE
+                name = 'Design'
+        ),
+        'Part-time',
+        '€2500-€3500',
+        'Rotterdam'
+    ),
+    (
+        UUID(),
+        'Job Seeker Title 3',
         (
             SELECT
                 id
@@ -556,11 +623,34 @@ VALUES
             FROM
                 categories
             WHERE
-                name = 'Design'
+                name = 'Digital Marketing'
+        ),
+        'Full-time',
+        '€3000-€4000',
+        'Utrecht'
+    ),
+    (
+        UUID(),
+        'Job Seeker Title 4',
+        (
+            SELECT
+                id
+            FROM
+                users
+            WHERE
+                email = 'testuser@example.com'
+        ),
+        (
+            SELECT
+                id
+            FROM
+                categories
+            WHERE
+                name = 'Sales'
         ),
         'Part-time',
         '€2500-€3500',
-        'Rotterdam'
+        'Amsterdam'
     );
 
 -- Insert sample applications
