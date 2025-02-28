@@ -42,7 +42,15 @@ $pastInterviews = Interview::getPastInterviews($_SESSION['user_id']);
                             <td class="py-2 px-4 border-b border-gray-200"><?= htmlspecialchars($interview->job_title) ?></td>
                             <td class="py-2 px-4 border-b border-gray-200"><?= date('F j, Y', strtotime($interview->scheduled_at)) ?></td>
                             <td class="py-2 px-4 border-b border-gray-200"><?= date('g:i A', strtotime($interview->scheduled_at)) ?></td>
-                            <td class="py-2 px-4 border-b border-gray-200"><?= ucfirst(htmlspecialchars($interview->status)) ?></td>
+                            <td class="py-2 px-4 border-b border-gray-200">
+                                <?php if ($interview->status == 'completed') : ?>
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Completed</span>
+                                <?php elseif ($interview->status == 'cancelled') : ?>
+                                <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Cancelled</span>
+                                <?php else : ?>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs"><?= ucfirst(htmlspecialchars($interview->status)) ?></span>
+                                <?php endif; ?>
+                            </td>
                             <td class="py-2 px-4 border-b border-gray-200">
                                 <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Details</button>
                             </td>
