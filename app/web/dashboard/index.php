@@ -1,66 +1,114 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_role'])) {
-    header('Location: /app/web/user/login.php');
+    header('Location: ../../user/login.php');
     exit();
 }
 
 define('DASHBOARD_ROUTED', true);
 
+$base_url = './dashboard/';
+
 $role = $_SESSION['user_role'];
 
-if ($role === 'admin') {
-    // If the admin has already selected a dashboard, then include the corresponding file.
-    if (isset($_POST['dashboard'])) {
-        $dashboard = $_POST['dashboard'];
-        switch ($dashboard) {
-            case 'admin':
-                include 'admin.php';  // admin dashboard page
-                exit();
-            case 'employer':
-                include 'employer.php';  // employer dashboard page
-                exit();
-            case 'user':
-                include 'user.php';  // user dashboard page
-                exit();
-            default:
-                include 'admin.php';
-                exit();
-        }
-    } else {
-        // Display a selection menu for the admin to choose the dashboard.
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Select Dashboard</title>
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-        </head>
-        <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-            <div class="bg-white p-6 rounded shadow-md w-80">
-                <h2 class="text-2xl font-bold mb-4 text-center">Dashboard Selection</h2>
-                <form method="post">
-                    <div class="mb-4">
-                        <label for="dashboard" class="block text-gray-700">Choose a dashboard:</label>
-                        <select name="dashboard" id="dashboard" class="mt-1 block w-full p-2 border border-gray-300 rounded">
-                            <option value="admin">Admin Dashboard</option>
-                            <option value="employer">Employer Dashboard</option>
-                            <option value="user">User Dashboard</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Go</button>
-                </form>
+// Determine which page to load
+$page = isset($_GET['page']) ? $_GET['page'] : 'overview';
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobSpot Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <?php include '../../core/navbar.php'; ?>
+    <div class="flex min-h-screen">
+        <!-- Dashboard Sidebar -->
+        <?php include 'dashboardBar.php'; ?>
+
+        <!-- Dashboard Content -->
+        <div class="flex-1 p-4 bg-gray-100">
+            <div id="loading" class="text-center p-8 hidden">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <p>Loading...</p>
             </div>
-        </body>
-        </html>
-        <?php
-        exit();
-    }
-} elseif ($role === 'employer') {
-    include 'employer.php';  // employer dashboard page
-    exit();
-} else {
-    include 'user.php';  // user dashboard page
-    exit();
-}
+            <div id="content-area">
+                <?php 
+                // Load the requested page
+                include "pages/$page.php";
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all dashboard links
+            const dashboardLinks = document.querySelectorAll('.dashboard-link');
+            
+            // Add click event handlers to each link
+            dashboardLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const page = this.getAttribute('data-page');
+                    loadPage(page);
+                    
+                    // Update active state
+                    dashboardLinks.forEach(l => l.classList.remove('bg-gray-700'));
+                    this.classList.add('bg-gray-700');
+                });
+            });
+            
+            // Function to load page content via AJAX
+            function loadPage(page) {
+                // Show loading indicator
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('content-area').classList.add('hidden');
+                
+                // Update URL without reloading the page
+                const newUrl = `./?page=${page}`;
+                history.pushState({page: page}, '', newUrl);
+                
+                // Fetch page content
+                fetch(`loadContent.php?page=${page}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('content-area').innerHTML = html;
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('content-area').classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error loading page:', error);
+                        document.getElementById('loading').classList.add('hidden');
+                        document.getElementById('content-area').classList.remove('hidden');
+                        document.getElementById('content-area').innerHTML = '<p class="text-red-500">Error loading content. Please try again.</p>';
+                    });
+            }
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(e) {
+                const page = e.state ? e.state.page : 'overview';
+                loadPage(page);
+                
+                // Update active state in navigation
+                dashboardLinks.forEach(link => {
+                    if (link.getAttribute('data-page') === page) {
+                        link.classList.add('bg-gray-700');
+                    } else {
+                        link.classList.remove('bg-gray-700');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
