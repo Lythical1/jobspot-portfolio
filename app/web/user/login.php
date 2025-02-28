@@ -10,7 +10,7 @@ if (isset($_POST['submit'])) {
 
     if (!empty($email) && !empty($password)) {
         $user = new Users();
-        $loginResult = $user->LoginUser($email, $password);
+        $loginResult = $user->loginUser($email, $password);
 
         if ($loginResult) {
             session_start();
