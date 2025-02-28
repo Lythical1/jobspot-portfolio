@@ -171,7 +171,7 @@ VALUES
         'Test',
         'Employer',
         'test@example.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        '$2y$10$dEBv2tZho6cSDo0irOS2oeZta/YZD75KpSgZnxj203r0p9/STObbO',
         'employer'
     ),
     (
@@ -179,7 +179,7 @@ VALUES
         'Test',
         'User',
         'testuser@example.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        '$2y$10$dEBv2tZho6cSDo0irOS2oeZta/YZD75KpSgZnxj203r0p9/STObbO',
         'user'
     );
 

@@ -105,9 +105,12 @@ VALUES
     (UUID(), 'Xena', 'Watson', 'xena.watson@example.com', 'password123', 'user'),
     (UUID(), 'Yosef', 'Brooks', 'yosef.brooks@example.com', 'password123', 'user'),
     (UUID(), 'Zara', 'Kelly', 'zara.kelly@example.com', 'password123', 'user'),
-    (UUID(), 'Someone', 'Test', 'someone@example.com', 'password123', 'user');
+    (UUID(), 'Someone', 'Test', 'someone@example.com', 'password123', 'user'),
+    (UUID(), 'Robert', 'Johnson', 'robert.johnson@example.com', 'password123', 'employer'),
+    (UUID(), 'Emily', 'Williams', 'emily.williams@example.com', 'password123', 'employer'),
+    (UUID(), 'Michael', 'Brown', 'michael.brown@example.com', 'password123', 'employer');
 
-INSERT INTO
+    INSERT INTO
     companies (id, name, description, location, website, user_id)
 VALUES
     (UUID(), 'Innovative Tech', 'Leading solutions in technology innovation', 'Amsterdam', 'https://innovativetech.example.com', (SELECT id FROM users WHERE email = 'kevin.martinez@example.com')),

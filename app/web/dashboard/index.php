@@ -7,8 +7,6 @@ if (!isset($_SESSION['user_role'])) {
 
 define('DASHBOARD_ROUTED', true);
 
-$base_url = './dashboard/';
-
 $role = $_SESSION['user_role'];
 
 // Determine which page to load

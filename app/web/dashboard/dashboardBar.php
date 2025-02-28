@@ -35,12 +35,15 @@ $dashboardOptions = [
 ];
 
 // Get current page from URL parameter
-$currentPage = isset($_GET['page']) ? $_GET['page'] : 'overview';
+$currentPage = $_GET['page'] ?? 'overview';
 ?>
 
 <!-- Dashboard Navigation Bar -->
 <div class="w-[250px] bg-gray-800 text-white p-4">
     <h3 class="text-xl font-bold mb-4">Dashboard</h3>
+    <h4 class="text-m mb-4">
+        Welcome, <?= $_SESSION['user_name'] ?>
+    </h4>
 
     <nav class="space-y-2">
         <?php foreach ($dashboardOptions as $option) : ?>
