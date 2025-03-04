@@ -7,7 +7,7 @@ CREATE TABLE users (
     profession VARCHAR(100),
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
-    profile_picture VARCHAR(255) DEFAULT 'default-avatar',
+    profile_picture VARCHAR(255) DEFAULT 'default-avatar.png',
     cv VARCHAR(255),
     role ENUM('user', 'employer', 'admin') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

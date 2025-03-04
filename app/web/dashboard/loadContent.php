@@ -1,5 +1,8 @@
 <?php
 
+// Start output buffering to prevent "headers already sent" errors
+ob_start();
+
 session_start();
 if (!isset($_SESSION['user_role'])) {
     echo "Please log in to access this content.";
