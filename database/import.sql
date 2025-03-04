@@ -6,7 +6,7 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     profession VARCHAR(100),
     password VARCHAR(255) NOT NULL,
-    phone VARCHAR(50),
+    phone_number VARCHAR(50),
     profile_picture VARCHAR(255) DEFAULT 'default-avatar.png',
     cv VARCHAR(255),
     role ENUM('user', 'employer', 'admin') DEFAULT 'user',
@@ -159,13 +159,14 @@ VALUES
 
 -- Insert sample users
 INSERT INTO
-    users (id, first_name, last_name, email, password, role)
+    users (id, first_name, last_name, email, phone_number, password, role)
 VALUES
     (
         UUID(),
         'Admin',
         'User',
         'admin@example.com',
+        '1234567890',
         '$2y$10$dEBv2tZho6cSDo0irOS2oeZta/YZD75KpSgZnxj203r0p9/STObbO',
         'admin'
     ),
@@ -174,6 +175,7 @@ VALUES
         'Test',
         'Employer',
         'test@example.com',
+        '0987654321',
         '$2y$10$dEBv2tZho6cSDo0irOS2oeZta/YZD75KpSgZnxj203r0p9/STObbO',
         'employer'
     ),
@@ -182,6 +184,7 @@ VALUES
         'Test',
         'User',
         'testuser@example.com',
+        '1234567890',
         '$2y$10$dEBv2tZho6cSDo0irOS2oeZta/YZD75KpSgZnxj203r0p9/STObbO',
         'user'
     );

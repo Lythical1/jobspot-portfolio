@@ -27,15 +27,15 @@ class Users
         $stmt->execute();
     }
 
-    public function updateUserInfo($id, $first_name, $last_name, $email, $phonenumber)
+    public function updateUserInfo($id, $first_name, $last_name, $email, $phone_number)
     {
         $pdo = Database::connectDb();
-        $stmt = $pdo->prepare("UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, phonenumber = :phonenumber WHERE id = :id");
+        $stmt = $pdo->prepare("UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, phone_number = :phone_number WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':first_name', $first_name);
         $stmt->bindParam(':last_name', $last_name);
         $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phonenumber', $phonenumber);
+        $stmt->bindParam(':phone_number', $phone_number);
         $stmt->execute();
     }
 
@@ -100,6 +100,16 @@ class Users
         $stmt = $pdo->prepare("UPDATE users SET cv = :cv WHERE id = :id");
         $stmt->bindParam(':id', $userId);
         $stmt->bindParam(':cv', $filePath);
+        $stmt->execute();
+    }
+
+    public function updateUserPassword($userId, $password)
+    {
+        $pdo = Database::connectDb();
+        $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
+        $stmt->bindParam(':id', $userId);
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $stmt->bindParam(':password', $hashedPassword);
         $stmt->execute();
     }
 }
