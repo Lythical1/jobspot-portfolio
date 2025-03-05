@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include '../../core/fileUpload.php';
     
     try {
-        // First verify password before making any changes
-        if (!isset($_POST['password']) || !password_verify($_POST['password'], $userInfo['password'])) {
-            throw new Exception('Password is incorrect. No changes were made.');
+        // Verify current password
+        if (!isset($_POST['current_password']) || !password_verify($_POST['current_password'], $userInfo['password'])) {
+            throw new Exception('Current password is incorrect. No changes were made.');
         }
         
         // Process profile picture update
@@ -33,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $users->updateUserInfo($_SESSION['user_id'], $_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['phone_number']);
         }
         
-        // Process password update if confirm_password is set
-        if (isset($_POST['confirm_password'])) {
-            if ($_POST['password'] === $_POST['confirm_password']) {
-                $users->updateUserPassword($_SESSION['user_id'], $_POST['password']);
+        // Process new password update if new_password is provided
+        if (isset($_POST['new_password']) && !empty($_POST['new_password'])) {
+            if ($_POST['new_password'] === $_POST['confirm_password']) {
+                $users->updateUserPassword($_SESSION['user_id'], $_POST['new_password']);
             } else {
-                throw new Exception('Passwords do not match. User information not updated.');
+                throw new Exception('New passwords do not match. User information not updated.');
             }
         }
         
@@ -163,25 +163,41 @@ if (isset($_SESSION['fail_message'])) {
                                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 required>
                         </div>
-                        <div class="w-3/5" id="password-section">
-                            <label for="password" class="block text-gray-700 font-medium mb-1">Password
-                                <a onclick="changePassword()" class="text-blue-500 hover:underline">Change Password</a>
-                            </label>
-                            <input type="password" id="password" name="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                placeholder="Enter password" required>
-                        </div>
-                        <div class="w-3/5" id="change-password-section" style="display:none">
-                            <label for="confirm_password" class="block text-gray-700 font-medium mb-1">Confirm
-                                Password</label>
-                            <input type="password" id="confirm_password" name="confirm_password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                placeholder="Re-enter password">
+                        <div class="w-3/5">
+                            <label for="current_password" class="block text-gray-700 font-medium mb-1">Current Password</label>
+                            <input type="password" id="current_password" name="current_password"
+                                placeholder="Enter current password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" required>
                         </div>
                     </div>
-                    <button type="submit"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200">Save
-                        Changes</button>
+                    <!-- New password divs -->
+                    <div class="mb-4" id="new-password-section" style="display:none">
+                        <div class="flex space-x-4">
+                            <div class="w-1/2">
+                                <label for="new_password" class="block text-gray-700 font-medium mb-1">New Password</label>
+                                <input type="password" id="new_password" name="new_password"
+                                    placeholder="Enter new password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 
+                                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            </div>
+                            <div class="w-1/2">
+                                <label for="confirm_password" class="block text-gray-700 font-medium mb-1">Confirm New Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password"
+                                    placeholder="Confirm new password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 
+                                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            </div>
+                        </div>
+                        <p>Please make sure the new password has at least 1 capital and 1 special character</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200">Save Changes</button>
+                        <button type="button"
+                            onclick="toggleNewPassword()"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-200">
+                            Change Password
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -189,42 +205,34 @@ if (isset($_SESSION['fail_message'])) {
 </div>
 
 <script>
-function changePassword() {    
-    const changePasswordSection = document.getElementById('change-password-section');
-    
-    if (changePasswordSection.style.display === 'none') {
-        changePasswordSection.style.display = 'block';
-        changePasswordSection.getElementsByTagName('input')[0].required = true;
-        document.getElementById('password-section').getElementsByTagName('input')[0].placeholder = 'Enter new password';
-    } else {
-        changePasswordSection.style.display = 'none';
-        changePasswordSection.getElementsByTagName('input')[0].required = false;
-        document.getElementById('password-section').getElementsByTagName('input')[0].placeholder = 'Enter password';
-    }
+// Toggle visibility of new password fields
+function toggleNewPassword() {
+    const newPwdSection = document.getElementById('new-password-section');
+    newPwdSection.style.display = newPwdSection.style.display === 'none' ? 'block' : 'none';
 }
 
+// Check if passwords match and validate password strength
 function validateForm() {
-    const changePasswordSection = document.getElementById('change-password-section');
+    const newPwdSection = document.getElementById('new-password-section');
     
-    // If change password section is visible, perform validation
-    if (changePasswordSection.style.display !== 'none') {
-        const password = document.getElementById('password').value;
+    if (newPwdSection.style.display !== 'none') {
+        const newPassword = document.getElementById('new_password').value;
         const confirmPassword = document.getElementById('confirm_password').value;
         let errorMessage = '';
-        if (password !== confirmPassword) {
-            errorMessage = 'Passwords do not match';
+        
+        if (newPassword !== confirmPassword) {
+            errorMessage = 'New passwords do not match';
         }
-        if (password.length < 8) {
-            errorMessage = 'Password must be at least 8 characters long';
+        if (newPassword.length < 8) {
+            errorMessage = 'New password must be at least 8 characters long';
         }
-        if (!/[A-Z]/.test(password)) {
-            errorMessage = 'Password must contain at least one capital letter';
+        if (!/[A-Z]/.test(newPassword)) {
+            errorMessage = 'New password must contain at least one capital letter';
         }
-        if (password.length < 8 && !/[A-Z]/.test(password)) {
-            errorMessage = 'Password must be at least 8 characters long and contain at least one capital letter';
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+            errorMessage = 'New password must contain at least one special character';
         }
         
-        // If there's an error, display it and prevent submission
         if (errorMessage) {
             let errorMsg = document.getElementById('password-error');
             if (!errorMsg) {
@@ -235,9 +243,8 @@ function validateForm() {
             }
             errorMsg.textContent = errorMessage;
             errorMsg.style.display = 'block';
-            return false; // Prevent form submission
+            return false;
         } else {
-            // Hide error message if it exists
             const errorMsg = document.getElementById('password-error');
             if (errorMsg) {
                 errorMsg.style.display = 'none';
@@ -245,6 +252,6 @@ function validateForm() {
         }
     }
     
-    return true; // Allow form submission
+    return true;
 }
 </script>
