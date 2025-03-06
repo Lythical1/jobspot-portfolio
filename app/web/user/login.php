@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 require_once '../../core/users.php';
 
@@ -13,8 +14,8 @@ if (isset($_POST['submit'])) {
         $loginResult = $user->loginUser($email, $password);
 
         if ($loginResult) {
-            session_start();
             $_SESSION['user_id'] = $loginResult['id'];
+            $_SESSION['user_name'] = $loginResult['first_name'] . ' ' . $loginResult['last_name'];
             $_SESSION['user_email'] = $loginResult['email'];
             $_SESSION['user_role'] = $loginResult['role'];
             header('Location: ../dashboard');
