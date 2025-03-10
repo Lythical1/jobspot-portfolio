@@ -40,8 +40,13 @@ try {
 
             <div id="searchBar">
                 <form action="index.php" method="GET" class="mb-4">
+                    <?php if ($role == 'user' || $role == 'admin' || $role == 'guest') : ?>
                     <input type="text" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>"
-                        class="border rounded p-2 w-full" placeholder="Search for jobs or job seekers...">
+                        class="border rounded p-2 w-full" placeholder="Search for jobs...">
+                        <?php elseif ($role == 'employer') : ?>
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>"
+                        class="border rounded p-2 w-full" placeholder="Search for job seekers...">
+                    <?php endif; ?>
                     <button type="submit" class="bg-blue-500 text-white rounded p-2 mt-2 w-full">Search</button>
                 </form>
             </div>
