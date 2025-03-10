@@ -38,7 +38,7 @@ class SearchHelper
             if (strlen($word1) < 4) continue;
             
             foreach ($words2 as $word2) {
-                if (strlen($word2) < 4) continue;
+                if (strlen($word2) < 3) continue;
                 
                 // String containment check
                 // This checks if one word is a substring of the other
