@@ -13,7 +13,7 @@ class SearchHelper
         return trim($string);
     }
 
-    public static function areSimilar($str1, $str2, $threshold = 3)
+    public static function areSimilar($str1, $str2, $threshold = 5)
     {
         $str1 = self::normalizeString($str1);
         $str2 = self::normalizeString($str2);

@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-$searchQuery = $_GET['q'] ?? '';
+$searchQuery = $_GET['search'] ?? '';
 $role = $_SESSION['user_role'] ?? 'guest';
 
 require_once '../../core/jobs.php';
@@ -38,26 +38,36 @@ try {
             </div>
             <?php endif; ?>
 
-            <?php if (empty($jobs) && empty($filteredSearchers)) : ?>
-            <p class="text-gray-600">No results found for your search.</p>
-            <?php else : ?>
-                <?php if (!empty($jobs)) : ?>
+            <div id="searchBar">
+                <form action="index.php" method="GET" class="mb-4">
+                    <input type="text" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>"
+                        class="border rounded p-2 w-full" placeholder="Search for jobs or job seekers...">
+                    <button type="submit" class="bg-blue-500 text-white rounded p-2 mt-2 w-full">Search</button>
+                </form>
+            </div>
+
+
+            <?php if (!empty($jobs) && ($role == 'user' || $role == 'admin' || $role == 'guest')) : ?>
             <h3 class="text-xl mb-3">Jobs</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <?php foreach ($jobs as $job) : ?>
+                <?php foreach ($jobs as $job) : ?>
                 <div class="bg-white p-4 rounded shadow">
                     <h3 class="font-bold"><?= htmlspecialchars($job['title']) ?></h3>
                     <p class="text-gray-600"><?= htmlspecialchars($job['company'] ?? 'Unknown Company') ?></p>
                     <p class="mt-2"><?= htmlspecialchars(substr($job['description'], 0, 150)) ?>...</p>
+                    <p class="text-sm text-gray-700 mt-2">
+                        <?= htmlspecialchars($job['salary_range'] ?? 'Salary not specified') ?>
+                    </p>
                 </div>
-                    <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
-                <?php endif; ?>
+            <?php endif; ?>
 
-                <?php if (!empty($filteredSearchers)) : ?>
+
+            <?php if (!empty($filteredSearchers) && ($role == 'employer' || $role == 'admin' || $role == 'guest')) : ?>
             <h3 class="text-xl mb-3">Job Seekers</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <?php foreach ($filteredSearchers as $searcher) : ?>
+                <?php foreach ($filteredSearchers as $searcher) : ?>
                 <div class="bg-white p-4 rounded shadow">
                     <h3 class="font-bold"><?= htmlspecialchars($searcher['title']) ?></h3>
                     <p class="text-gray-600"><?= htmlspecialchars($searcher['location'] ?? 'Location not specified') ?>
@@ -67,9 +77,8 @@ try {
                         <?= htmlspecialchars($searcher['salary_range']) ?>
                     </p>
                 </div>
-                    <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
-                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
