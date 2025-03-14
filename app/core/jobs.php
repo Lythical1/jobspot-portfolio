@@ -64,10 +64,7 @@ class JobRepository
 
         // Filter jobs based on similarity
         $results['jobs'] = $this->formatSalaryRanges(array_filter($allJobs, function ($job) use ($query) {
-            return strpos(
-                SearchHelper::normalizeString($job['title']), 
-                SearchHelper::normalizeString($query)
-            ) !== false;
+            return SearchHelper::areSimilar($job['title'], $query);
         }));
 
         // Filter searchers based on similarity

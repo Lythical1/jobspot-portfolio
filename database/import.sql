@@ -264,7 +264,7 @@ VALUES
         'Senior PHP Developer',
         'We are looking for an experienced PHP developer to join our team.',
         'Min 5 years experience with PHP\nKnowledge of MySQL\nExperience with MVC frameworks',
-        '€4000-€5500',
+        'EUR4000-EUR5500',
         'Amsterdam',
         (
             SELECT
@@ -288,7 +288,7 @@ VALUES
         'Frontend Developer',
         'Looking for a frontend developer with React experience',
         'Experience with React\nKnowledge of JavaScript\nCSS expertise',
-        '€3500-€4500',
+        'EUR3500-EUR4500',
         'Rotterdam',
         (
             SELECT
@@ -312,7 +312,7 @@ VALUES
         'UX Designer',
         'Seeking creative UX designer for digital products',
         'Portfolio required\nFigma expertise\n3+ years experience',
-        '€3000-€4000',
+        'EUR3000-EUR4000',
         'Utrecht',
         (
             SELECT
@@ -336,7 +336,7 @@ VALUES
         'Data Analyst',
         'Analyze data and generate actionable insights.',
         'Proficiency in SQL, Excel, and data visualization tools.',
-        '€3500-€4500',
+        'EUR3500-EUR4500',
         'Amsterdam',
         (
             SELECT
@@ -360,7 +360,7 @@ VALUES
         'Product Manager',
         'Oversee product development and market strategy.',
         'Experience in managing product lifecycle and agile methodologies.',
-        '€4500-€6000',
+        'EUR4500-EUR6000',
         'Rotterdam',
         (
             SELECT
@@ -585,7 +585,7 @@ VALUES
                 name = 'Development'
         ),
         '40 hours/week',
-        '€3500-€5000',
+        'EUR3500-EUR5000',
         'Amsterdam'
     ),
     (
@@ -609,7 +609,7 @@ VALUES
                 name = 'Design'
         ),
         'Part-time',
-        '€2500-€3500',
+        'EUR2500-EUR3500',
         'Rotterdam'
     ),
     (
@@ -632,7 +632,7 @@ VALUES
                 name = 'Digital Marketing'
         ),
         'Full-time',
-        '€3000-€4000',
+        'EUR3000-EUR4000',
         'Utrecht'
     ),
     (
@@ -655,7 +655,7 @@ VALUES
                 name = 'Sales'
         ),
         'Part-time',
-        '€2500-€3500',
+        'EUR2500-EUR3500',
         'Amsterdam'
     );
 

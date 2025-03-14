@@ -18,14 +18,47 @@ class SearchHelper
         $str1 = self::normalizeString($str1);
         $str2 = self::normalizeString($str2);
 
-        // Check exact match first
         if ($str1 === $str2) {
             return true;
         }
 
-        // Check if strings are similar enough using Levenshtein distance
-        $distance = levenshtein($str1, $str2);
-        return $distance <= $threshold;
+        if (empty($str1) || empty($str2)) {
+            return false;
+        }
+
+        $words1 = array_filter(explode(' ', $str1));
+        $words2 = array_filter(explode(' ', $str2));
+        
+        if (empty($words1) || empty($words2)) {
+            return false;
+        }
+
+        // Check each word in the first string against each word in the second string
+        foreach ($words1 as $word1) {
+            if (strlen($word1) < 4) continue;
+            
+            foreach ($words2 as $word2) {
+                if (strlen($word2) < 3) continue;
+                
+                // String containment check
+                // This checks if one word is a substring of the other
+                if (strpos($word2, $word1) !== false || strpos($word1, $word2) !== false) {
+                    return true;
+                }
+                
+        
+                $distance = levenshtein($word1, $word2);
+                
+                // Dynamic threshold based on word length
+                $wordThreshold = min(strlen($word1), strlen($word2)) > 5 ? $threshold : 3;
+                
+                if ($distance <= $wordThreshold) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static function formatSalary($salary)
