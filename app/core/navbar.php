@@ -17,8 +17,8 @@
                         class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">About</a>
                     <a href="/projects"
                         class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
-                    <a href="/contact"
-                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                    <a href="/search"
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Search</a>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                 <a href="/user/logout"
                     class="bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600">Logout</a>
             </div>
-            <?php else: ?>
+            <?php else : ?>
             <div class="w-32 hidden md:flex items-center justify-end space-x-4 flex-none">
                 <a href="/user/register"
                     class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Register</a>
@@ -80,7 +80,7 @@
                     class="bg-blue-500 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-600">Profile</a>
                 <a href="/user/logout"
                     class="bg-red-500 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-red-600">Logout</a>
-                <?php else: ?>
+                <?php else : ?>
                 <a href="/user/register"
                     class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Register</a>
                 <a href="/user/login"
