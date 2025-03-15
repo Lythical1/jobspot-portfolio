@@ -28,9 +28,8 @@ class JobRepository
     
     public function searchJobs($query, $categoryFilters = [])
     {
-        $results = ['jobs' => [], 'searchers' => []];
         $pdo = Database::connectDb();
-    
+
         $sql = "SELECT jobs.*, companies.name as company 
                 FROM jobs 
                 LEFT JOIN companies ON jobs.company_id = companies.id";
@@ -60,36 +59,9 @@ class JobRepository
             $stmt->bindValue($index + 1, $value);
         }
         $stmt->execute();
-        $results['jobs'] = $this->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
-
-        // Get job seekers
-        $jobSearcherRepo = new JobSearcher();
         
-        // Apply category filter to job searchers
-        if (!empty($categoryFilters)) {
-            $allSearchers = $jobSearcherRepo->filterSearchers($categoryFilters);
-        } else {
-            $allSearchers = $jobSearcherRepo->getSearchers();
-        }
-        
-        // Apply text filter to job seekers if query exists
-        if (!empty($query)) {
-            $allSearchers = array_filter($allSearchers, function ($searcher) use ($query) {
-                return SearchHelper::areSimilar($searcher['title'], $query);
-            });
-        }
-        
-        $results['searchers'] = $this->formatSalaryRanges($allSearchers);
-        return $results;
-    }
-
-    private function formatSalaryRanges($items)
-    {
-        return array_map(function ($item) {
-            if (isset($item['salary_range'])) {
-                $item['salary_range'] = SearchHelper::formatSalary($item['salary_range']);
-            }
-            return $item;
-        }, $items);
+        $searchHelper = new SearchHelper();
+        $formattedJobs = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
+        return ['jobs' => $formattedJobs];
     }
 }

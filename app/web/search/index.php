@@ -5,14 +5,21 @@ $role = $_SESSION['user_role'] ?? 'guest';
 $selectedCategories = isset($_GET['categories']) ? $_GET['categories'] : [];
 
 require_once '../../core/jobs.php';
+require_once '../../core/job_searchers.php';
 
 try {
     $jobRepo = new JobRepository();
-    $results = $jobRepo->searchJobs($searchQuery, $selectedCategories);
-    $jobs = $results['jobs'];
-    $filteredSearchers = $results['searchers'];
+    $jobSearcherRepo = new JobSearcher();
+
+
+    $jobResults = $jobRepo->searchJobs($searchQuery, $selectedCategories);
+    $jobs = $jobResults['jobs'];
+
+
+    $searcherResults = $jobSearcherRepo->getSearchers($searchQuery, $selectedCategories);
+    $filteredSearchers = $searcherResults['searchers'];
 } catch (Exception $e) {
-    $error = "An error occurred while searching. Please try again later.";
+    $error = "An error occurred while searching: " . htmlspecialchars($e->getMessage());
     $jobs = [];
     $filteredSearchers = [];
 }
