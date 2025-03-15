@@ -17,61 +17,69 @@ class JobRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    
-    public function filterJobs($filters)
+
+    public function getCategories()
     {
         $pdo = Database::connectDb();
-        if (!is_array($filters)) {
-            $filters = [$filters];
-        }
-        $filterPlaceholders = implode(',', array_fill(0, count($filters), '?'));
-        $stmt = $pdo->prepare("SELECT * FROM jobs WHERE category_id IN ($filterPlaceholders)");
-        
-        foreach ($filters as $index => $filter) {
-            $stmt->bindValue($index + 1, $filter, PDO::PARAM_INT);
-        }
+        $stmt = $pdo->prepare("SELECT * FROM categories");
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    public function searchJobs($query)
+    
+    public function searchJobs($query, $categoryFilters = [])
     {
-        $results = [
-            'jobs' => [],
-            'searchers' => []
-        ];
-
+        $results = ['jobs' => [], 'searchers' => []];
         $pdo = Database::connectDb();
+    
+        $sql = "SELECT jobs.*, companies.name as company 
+                FROM jobs 
+                LEFT JOIN companies ON jobs.company_id = companies.id";
         
-        // Get all jobs
-        $stmt = $pdo->prepare("
-            SELECT jobs.*, companies.name as company 
-            FROM jobs 
-            LEFT JOIN companies ON jobs.company_id = companies.id
-        ");
-        $stmt->execute();
-        $allJobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Get all searchers
-        $jobSearcherRepo = new JobSearcher();
-        $allSearchers = $jobSearcherRepo->getSearchers();
-
-        if (empty($query)) {
-            $results['jobs'] = $this->formatSalaryRanges($allJobs);
-            $results['searchers'] = $this->formatSalaryRanges($allSearchers);
-            return $results;
+        $params = [];
+        $conditions = [];
+        
+        // Add category filter
+        if (!empty($categoryFilters)) {
+            $placeholders = implode(',', array_fill(0, count($categoryFilters), '?'));
+            $conditions[] = "jobs.category_id IN ($placeholders)";
+            $params = array_values($categoryFilters);
+        }
+        
+        if (!empty($query)) {
+            $conditions[] = "jobs.title LIKE ?";
+            $params[] = "%$query%";
         }
 
-        // Filter jobs based on similarity
-        $results['jobs'] = $this->formatSalaryRanges(array_filter($allJobs, function ($job) use ($query) {
-            return SearchHelper::areSimilar($job['title'], $query);
-        }));
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
 
-        // Filter searchers based on similarity
-        $results['searchers'] = $this->formatSalaryRanges(array_filter($allSearchers, function ($searcher) use ($query) {
-            return SearchHelper::areSimilar($searcher['title'], $query);
-        }));
+        // Execute job query
+        $stmt = $pdo->prepare($sql);
+        foreach ($params as $index => $value) {
+            $stmt->bindValue($index + 1, $value);
+        }
+        $stmt->execute();
+        $results['jobs'] = $this->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
 
+        // Get job seekers
+        $jobSearcherRepo = new JobSearcher();
+        
+        // Apply category filter to job searchers
+        if (!empty($categoryFilters)) {
+            $allSearchers = $jobSearcherRepo->filterSearchers($categoryFilters);
+        } else {
+            $allSearchers = $jobSearcherRepo->getSearchers();
+        }
+        
+        // Apply text filter to job seekers if query exists
+        if (!empty($query)) {
+            $allSearchers = array_filter($allSearchers, function ($searcher) use ($query) {
+                return SearchHelper::areSimilar($searcher['title'], $query);
+            });
+        }
+        
+        $results['searchers'] = $this->formatSalaryRanges($allSearchers);
         return $results;
     }
 
