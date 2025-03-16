@@ -73,4 +73,14 @@ class SearchHelper
         }
         return '€ ' . trim($salary);
     }
+
+    public function formatSalaryRanges($items)
+    {
+        return array_map(function ($item) {
+            if (isset($item['salary_range'])) {
+                $item['salary_range'] = self::formatSalary($item['salary_range']);
+            }
+            return $item;
+        }, $items);
+    }
 }
