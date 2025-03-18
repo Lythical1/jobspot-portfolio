@@ -23,7 +23,7 @@ class JobSearcher
         }
         
         if (!empty($query)) {
-            $conditions[] = "job_searchers.name LIKE ?";
+            $conditions[] = "job_searchers.title LIKE ?";
             $params[] = "%$query%";
         }
 
