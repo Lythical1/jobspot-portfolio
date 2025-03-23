@@ -2,20 +2,19 @@
 
 require_once 'database.php';
 require_once 'algoSearch.php';
-require_once 'job_searchers.php';
 
 class JobRepository
 {
     public function getJobs()
     {
-        $pdo = Database::connectDb();
-        $stmt = $pdo->prepare("
-            SELECT jobs.*, companies.name as company 
-            FROM jobs 
-            LEFT JOIN companies ON jobs.company_id = companies.id
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll();
+            $pdo = Database::connectDb();
+            $stmt = $pdo->prepare("
+                SELECT jobs.*, companies.name as company 
+                FROM jobs 
+                LEFT JOIN companies ON jobs.company_id = companies.id
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll();
     }
 
     public function getCategories()
@@ -63,5 +62,21 @@ class JobRepository
         $searchHelper = new SearchHelper();
         $formattedJobs = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
         return ['jobs' => $formattedJobs];
+    }
+
+    public function getRandomJobs($amount = 3) 
+    {
+        $pdo = Database::connectDb();
+        $stmt = $pdo->prepare("
+            SELECT jobs.*, companies.name as company, categories.name as category 
+            FROM jobs 
+            LEFT JOIN companies ON jobs.company_id = companies.id 
+            LEFT JOIN categories ON jobs.category_id = categories.id
+            ORDER BY RAND() LIMIT ?
+        ");
+        $stmt->bindValue(1, $amount, PDO::PARAM_INT);
+        $stmt->execute();
+        $searchHelper = new SearchHelper();
+        return $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 }

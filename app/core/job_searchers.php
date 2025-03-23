@@ -57,4 +57,17 @@ class JobSearcher
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function getRandomSearchers($amount = 3)
+    {
+        $pdo = Database::connectDb();
+        $stmt = $pdo->prepare("SELECT job_searchers.*, categories.name as category 
+                               FROM job_searchers 
+                               LEFT JOIN categories ON job_searchers.category_id = categories.id 
+                               ORDER BY RAND() LIMIT ?");
+        $stmt->bindValue(1, $amount, PDO::PARAM_INT);
+        $stmt->execute();
+        $searchHelper = new SearchHelper();
+        return $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
 }
