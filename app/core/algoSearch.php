@@ -35,7 +35,7 @@ class SearchHelper
 
         // Check each word in the first string against each word in the second string
         foreach ($words1 as $word1) {
-            if (strlen($word1) < 4) continue;
+            if (strlen($word1) < 3) continue;
             
             foreach ($words2 as $word2) {
                 if (strlen($word2) < 3) continue;
@@ -51,7 +51,7 @@ class SearchHelper
                 
                 // Dynamic threshold based on word length
                 $wordThreshold = min(strlen($word1), strlen($word2)) > 5 ? $threshold : 3;
-                
+
                 if ($distance <= $wordThreshold) {
                     return true;
                 }

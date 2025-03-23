@@ -15,32 +15,45 @@ class JobSearcher
         $params = [];
         $conditions = [];
         
-        // Add category filter
+        // Add category filter (keep this in SQL for efficiency)
         if (!empty($categoryFilters)) {
             $placeholders = implode(',', array_fill(0, count($categoryFilters), '?'));
             $conditions[] = "job_searchers.category_id IN ($placeholders)";
             $params = array_values($categoryFilters);
         }
         
-        if (!empty($query)) {
-            $conditions[] = "job_searchers.title LIKE ?";
-            $params[] = "%$query%";
-        }
-
+        // We're not using LIKE search anymore, but we'll fetch all potential matches
+        // and filter later with areSimilar
+        
         if (!empty($conditions)) {
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
-
+        
         $stmt = $pdo->prepare($sql);
         foreach ($params as $index => $value) {
             $stmt->bindValue($index + 1, $value);
         }
         $stmt->execute();
+        
+        $searchers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $filteredSearchers = $searchers;
+        
+        // Apply text search using areSimilar if query is provided
+        if (!empty($query)) {
+            $filteredSearchers = [];
+            foreach ($searchers as $searcher) {
+                // Check if query matches title, skills or other relevant fields
+                if (SearchHelper::areSimilar($query, $searcher['title']) ||
+                    SearchHelper::areSimilar($query, $searcher['category'] ?? '')) {
+                    $filteredSearchers[] = $searcher;
+                }
+            }
+        }
+        
         $searchHelper = new SearchHelper();
-        $formattedSearchers = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $formattedSearchers = $searchHelper->formatSalaryRanges($filteredSearchers);
         return ['searchers' => $formattedSearchers];
     }
-
 
     public function filterSearchers($filters)
     {
