@@ -253,6 +253,7 @@ INSERT INTO
         title,
         description,
         requirements,
+        work_hours,
         salary_range,
         location,
         company_id,
@@ -264,6 +265,7 @@ VALUES
         'Senior PHP Developer',
         'We are looking for an experienced PHP developer to join our team.',
         'Min 5 years experience with PHP\nKnowledge of MySQL\nExperience with MVC frameworks',
+        'Full-time',
         'EUR4000-EUR5500',
         'Amsterdam',
         (
@@ -288,6 +290,7 @@ VALUES
         'Frontend Developer',
         'Looking for a frontend developer with React experience',
         'Experience with React\nKnowledge of JavaScript\nCSS expertise',
+        '32 hours',
         'EUR3500-EUR4500',
         'Rotterdam',
         (
@@ -312,6 +315,7 @@ VALUES
         'UX Designer',
         'Seeking creative UX designer for digital products',
         'Portfolio required\nFigma expertise\n3+ years experience',
+        'Part-time',
         'EUR3000-EUR4000',
         'Utrecht',
         (
@@ -336,6 +340,7 @@ VALUES
         'Data Analyst',
         'Analyze data and generate actionable insights.',
         'Proficiency in SQL, Excel, and data visualization tools.',
+        '36 hours',
         'EUR3500-EUR4500',
         'Amsterdam',
         (
@@ -360,6 +365,7 @@ VALUES
         'Product Manager',
         'Oversee product development and market strategy.',
         'Experience in managing product lifecycle and agile methodologies.',
+        'Full-time',
         'EUR4500-EUR6000',
         'Rotterdam',
         (
