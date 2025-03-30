@@ -17,14 +17,18 @@ class Users
         return $stmt->fetch();
     }
 
-    public function createUser($name, $email, $password)
+    public function createUser($first_name, $last_name, $email, $password)
     {
         $pdo = Database::connectDb();
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
-        $stmt->bindParam(':name', $name);
+        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (:first_name, :last_name, :email, :password)");
+        $stmt->bindParam(':first_name', $first_name);
+        $stmt->bindParam(':last_name', $last_name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', $password);
         $stmt->execute();
+        
+
+        return $pdo->lastInsertId();
     }
 
     public function updateUserInfo($id, $first_name, $last_name, $email, $phone_number)
@@ -72,9 +76,9 @@ class Users
         $stmt->execute();
         $user = $stmt->fetch();
         
-        // Delete profile picture if not default
+        // Delete existing profile picture if not default
         if ($user && !empty($user['profile_picture']) && $user['profile_picture'] !== 'default-avatar.png') {
-            $existingFile = '../../assets/profiles/' . $user['profile_picture'];
+            $existingFile = $_SERVER['DOCUMENT_ROOT'] . '/assets/profiles/' . $user['profile_picture'];
             if (file_exists($existingFile)) {
                 unlink($existingFile);
             }
@@ -84,32 +88,41 @@ class Users
         $stmt = $pdo->prepare("UPDATE users SET profile_picture = :profile_picture WHERE id = :id");
         $stmt->bindParam(':id', $userId);
         $stmt->bindParam(':profile_picture', $fileName);
-        $stmt->execute();
+        return $stmt->execute();
     }
 
     public function updateUserCV($userId, $fileName)
     {
         $pdo = Database::connectDb();
         
-        if (file_exists($fileName)) {
-            unlink($fileName);
-        } else {
-            throw new Exception("File not found3.");
+        // Get existing CV file
+        $stmt = $pdo->prepare("SELECT cv FROM users WHERE id = :id");
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+        $user = $stmt->fetch();
+        
+        // Delete existing CV if it exists
+        if ($user && !empty($user['cv'])) {
+            $existingFile = $_SERVER['DOCUMENT_ROOT'] . '/assets/cv/' . $user['cv'];
+            if (file_exists($existingFile)) {
+                unlink($existingFile);
+            }
         }
         
+        // Update with new CV
         $stmt = $pdo->prepare("UPDATE users SET cv = :cv WHERE id = :id");
         $stmt->bindParam(':id', $userId);
-        $stmt->bindParam(':cv', $filePath);
-        $stmt->execute();
+        $stmt->bindParam(':cv', $fileName);
+        return $stmt->execute();
     }
 
     public function updateUserPassword($userId, $password)
     {
         $pdo = Database::connectDb();
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
         $stmt->bindParam(':id', $userId);
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $stmt->bindParam(':password', $hashedPassword);
-        $stmt->execute();
+        return $stmt->execute();
     }
 }
