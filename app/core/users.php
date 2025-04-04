@@ -17,14 +17,15 @@ class Users
         return $stmt->fetch();
     }
 
-    public function createUser($first_name, $last_name, $email, $password)
+    public function createUser($first_name, $last_name, $email, $password, $role)
     {
         $pdo = Database::connectDb();
-        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (:first_name, :last_name, :email, :password)");
+        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (:first_name, :last_name, :email, :password, :role)");
         $stmt->bindParam(':first_name', $first_name);
         $stmt->bindParam(':last_name', $last_name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':role', $role);
         $stmt->execute();
         
 
