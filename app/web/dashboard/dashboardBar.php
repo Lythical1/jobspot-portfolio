@@ -1,7 +1,7 @@
 <?php
 
-// Dashboard navigation options
-$dashboardOptions = [
+// Dashboard navigation options based on user type
+$commonOptions = [
     [
         'title' => 'Overview',
         'icon' => 'fas fa-home',
@@ -11,28 +11,40 @@ $dashboardOptions = [
         'title' => 'Interviews',
         'icon' => 'fas fa-calendar-check',
         'link' => 'interviews'
-    ],
-    [
-        'title' => 'Applications',
-        'icon' => 'fas fa-file-alt',
-        'link' => 'applications'
-    ],
-    [
+    ]
+];
+
+$userSpecificOptions = [];
+
+// Add different options based on user type
+if ($_SESSION['user_role'] === 'company' || $_SESSION['user_role'] === 'admin') {
+    // Company specific options
+    $userSpecificOptions[] = [
         'title' => 'Job Offers',
         'icon' => 'fas fa-handshake',
         'link' => 'offers'
-    ],
-    [
-        'title' => 'Statistics',
-        'icon' => 'fas fa-chart-line',
-        'link' => 'statistics'
-    ],
+    ];
+}
+if ($_SESSION['user_role'] === 'job_seeker' || $_SESSION['user_role'] === 'admin') {
+    // Job seeker specific options
+    $userSpecificOptions[] = [
+        'title' => 'Applications',
+        'icon' => 'fas fa-file-alt',
+        'link' => 'applications'
+    ];
+}
+
+// Settings option for all users
+$settingsOption = [
     [
         'title' => 'Settings',
         'icon' => 'fas fa-cog',
         'link' => 'settings'
     ]
 ];
+
+// Combine all options
+$dashboardOptions = array_merge($commonOptions, $userSpecificOptions, $settingsOption);
 
 // Get current page from URL parameter
 $currentPage = $_GET['page'] ?? 'overview';
@@ -43,6 +55,9 @@ $currentPage = $_GET['page'] ?? 'overview';
     <h3 class="text-xl font-bold mb-4">Dashboard</h3>
     <h4 class="text-m mb-4">
         Welcome, <?= $_SESSION['user_name'] ?>
+        <?php if (isset($_SESSION['user_role'])) : ?>
+        <span class="text-xs block text-gray-400">(<?= ucfirst($_SESSION['user_role']) ?>)</span>
+        <?php endif; ?>
     </h4>
 
     <nav class="space-y-2">
