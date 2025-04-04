@@ -79,6 +79,10 @@ class JobSearcher
         if (!empty($data['salary_range'])) {
             // Remove € symbol if present
             $data['salary_range'] = str_replace('€', '', $data['salary_range']);
+
+            $data['salary_range'] = str_replace('.', '', $data['salary_range']);
+
+            $data['salary_range'] = str_replace(',', '', $data['salary_range']);
             
             // Add EUR prefix if not already present
             if (strpos($data['salary_range'], 'EUR') !== 0) {
