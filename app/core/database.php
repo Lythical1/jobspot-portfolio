@@ -2,42 +2,34 @@
 
 class Database
 {
-    public function __construct()
+    private static $connection;
+
+    public static function connectDb()
     {
-    }
-    private static function connectDb()
-    {
-        try {
-            $pdo = new PDO(
-                "mysql:host=mysql;dbname=jobspot",
-                "bit_academy",
-                "bit_academy"
-            );
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            return $pdo;
-        } catch (PDOException $e) {
-            echo "Please contact the administrator. <br>";
-            die("Connection failed: " . $e->getMessage());
+        if (!isset(self::$connection)) {
+            $config = self::getConfig();
+            try {
+                self::$connection = new PDO(
+                    "mysql:host={$config['host']};dbname={$config['database']};charset=utf8mb4",
+                    $config['username'],
+                    $config['password'],
+                    [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]
+                );
+                self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                die("Connection failed: " . $e->getMessage());
+            }
         }
+        return self::$connection;
     }
 
-    public function getJobs()
+    private static function getConfig()
     {
-        $pdo = $this->connectDb();
-        $stmt = $pdo->prepare("
-            SELECT jobs.*, companies.name as company 
-            FROM jobs 
-            LEFT JOIN companies ON jobs.company_id = companies.id
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-    
-    public function getCompanies()
-    {
-        $pdo = $this->connectDb();
-        $stmt = $pdo->prepare("SELECT * FROM companies");
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return [
+            'host' => 'mysql',
+            'database' => 'jobspot',
+            'username' => 'bit_academy',
+            'password' => 'bit_academy'
+        ];
     }
 }
