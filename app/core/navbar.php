@@ -13,9 +13,9 @@
             <div class="hidden md:flex items-center justify-center flex-1">
                 <div class="flex items-center space-x-8">
                     <a href="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="/about"
+                    <a href="#"
                         class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">About</a>
-                    <a href="/projects"
+                    <a href="#"
                         class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Projects</a>
                     <a href="/search"
                         class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Search</a>
