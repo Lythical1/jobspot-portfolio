@@ -29,40 +29,50 @@ class JobRepository
     public function searchJobs($query, $categoryFilters = [])
     {
         $pdo = Database::connectDb();
-
-        $sql = "SELECT jobs.*, companies.name as company 
+        $sql = "SELECT jobs.*, companies.name as company, categories.name as category 
                 FROM jobs 
-                LEFT JOIN companies ON jobs.company_id = companies.id";
+                LEFT JOIN companies ON jobs.company_id = companies.id
+                LEFT JOIN categories ON jobs.category_id = categories.id";
         
         $params = [];
         $conditions = [];
         
-        // Add category filter
+        // Add category filter (we'll keep this in SQL for efficiency)
         if (!empty($categoryFilters)) {
             $placeholders = implode(',', array_fill(0, count($categoryFilters), '?'));
             $conditions[] = "jobs.category_id IN ($placeholders)";
             $params = array_values($categoryFilters);
         }
         
-        if (!empty($query)) {
-            $conditions[] = "jobs.title LIKE ?";
-            $params[] = "%$query%";
-        }
-
         if (!empty($conditions)) {
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
-
-        // Execute job query
+        
         $stmt = $pdo->prepare($sql);
         foreach ($params as $index => $value) {
             $stmt->bindValue($index + 1, $value);
         }
         $stmt->execute();
         
-        $searchHelper = new SearchHelper();
-        $formattedJobs = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
-        return ['jobs' => $formattedJobs];
+        $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $filteredJobs = $jobs;
+        
+        // Apply text search using areSimilar if query is provided
+        if (!empty($query)) {
+            $filteredJobs = [];
+            foreach ($jobs as $job) {
+                // Check if query matches title, description or required skills using areSimilar
+                if (
+                    SearchHelper::areSimilar($query, $job['title']) ||
+                    SearchHelper::areSimilar($query, $job['category'] ?? '')
+                ) {
+                    $filteredJobs[] = $job;
+                }
+            }
+        }
+        
+        // Return the results with the expected structure
+        return ['jobs' => $filteredJobs];
     }
 
     public function getCompanyID($userId)
@@ -121,5 +131,20 @@ class JobRepository
         ]);
         $jobId = $pdo->lastInsertId();
         return $jobId;
+    }
+
+    public function deleteJob($jobId)
+    {
+        try {
+            $pdo = Database::connectDb();
+            
+            $stmt = $pdo->prepare("DELETE FROM jobs WHERE id = ?");
+            $stmt->execute([$jobId]);
+            
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error deleting job: " . $e->getMessage());
+            return false;
+        }
     }
 }

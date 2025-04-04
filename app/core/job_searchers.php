@@ -15,29 +15,42 @@ class JobSearcher
         $params = [];
         $conditions = [];
         
-        // Add category filter
+        // Add category filter (keep this in SQL for efficiency)
         if (!empty($categoryFilters)) {
             $placeholders = implode(',', array_fill(0, count($categoryFilters), '?'));
             $conditions[] = "job_searchers.category_id IN ($placeholders)";
             $params = array_values($categoryFilters);
         }
         
-        if (!empty($query)) {
-            $conditions[] = "job_searchers.title LIKE ?";
-            $params[] = "%$query%";
-        }
-
         if (!empty($conditions)) {
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
-
+        
         $stmt = $pdo->prepare($sql);
         foreach ($params as $index => $value) {
             $stmt->bindValue($index + 1, $value);
         }
         $stmt->execute();
+        
+        $searchers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $filteredSearchers = $searchers;
+        
+        // Apply text search using areSimilar if query is provided
+        if (!empty($query)) {
+            $filteredSearchers = [];
+            foreach ($searchers as $searcher) {
+                // Check if query matches title, skills or other relevant fields
+                if (
+                    SearchHelper::areSimilar($query, $searcher['title']) ||
+                    SearchHelper::areSimilar($query, $searcher['category'] ?? '')
+                ) {
+                    $filteredSearchers[] = $searcher;
+                }
+            }
+        }
+        
         $searchHelper = new SearchHelper();
-        $formattedSearchers = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $formattedSearchers = $searchHelper->formatSalaryRanges($filteredSearchers);
         return ['searchers' => $formattedSearchers];
     }
 
@@ -116,5 +129,20 @@ class JobSearcher
         $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function deleteSearcher($searcherId)
+    {
+        try {
+            $pdo = Database::connectDb();
+            
+            $stmt = $pdo->prepare("DELETE FROM job_searchers WHERE id = ?");
+            $stmt->execute([$searcherId]);
+            
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error deleting job seeker: " . $e->getMessage());
+            return false;
+        }
     }
 }

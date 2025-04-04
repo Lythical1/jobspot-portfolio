@@ -11,13 +11,16 @@ try {
     $jobRepo = new JobRepository();
     $jobSearcherRepo = new JobSearcher();
 
-
+    // Update how we handle job results to fix null array error
     $jobResults = $jobRepo->searchJobs($searchQuery, $selectedCategories);
-    $jobs = $jobResults['jobs'];
-
+    // Ensure we have a jobs array even if the result isn't structured as expected
+    $jobs = is_array($jobResults) && isset($jobResults['jobs']) ? $jobResults['jobs'] : 
+            (is_array($jobResults) ? $jobResults : []);
 
     $searcherResults = $jobSearcherRepo->getSearchers($searchQuery, $selectedCategories);
-    $filteredSearchers = $searcherResults['searchers'];
+    $filteredSearchers = is_array($searcherResults) && isset($searcherResults['searchers']) ? 
+                        $searcherResults['searchers'] : 
+                        (is_array($searcherResults) ? $searcherResults : []);
 } catch (Exception $e) {
     $error = "An error occurred while searching: " . htmlspecialchars($e->getMessage());
     $jobs = [];
@@ -121,7 +124,19 @@ try {
             <h3 class="text-xl mb-3">Jobs</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <?php foreach ($jobs as $job) : ?>
-                <div class="bg-white p-4 rounded shadow">
+                <div class="bg-white p-4 rounded shadow relative">
+                    <?php if ($role == 'admin') : ?>
+                    <div class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-red-500 trash-icon"
+                        data-type="job" data-id="<?= $job['id'] ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                        </svg>
+                    </div>
+                    <?php endif; ?>
                     <h3 class="font-bold"><?= htmlspecialchars($job['title']) ?></h3>
                     <p class="text-gray-600"><?= htmlspecialchars($job['company'] ?? 'Unknown Company') ?></p>
                     <p class="mt-2"><?= htmlspecialchars(substr($job['description'], 0, 150)) ?>...</p>
@@ -136,7 +151,19 @@ try {
             <h3 class="text-xl mb-3">Job Seekers</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <?php foreach ($filteredSearchers as $searcher) : ?>
-                <div class="bg-white p-4 rounded shadow">
+                <div class="bg-white p-4 rounded shadow relative">
+                    <?php if ($role == 'admin') : ?>
+                    <div class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-red-500 trash-icon"
+                        data-type="seeker" data-id="<?= $searcher['id'] ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                        </svg>
+                    </div>
+                    <?php endif; ?>
                     <h3 class="font-bold"><?= htmlspecialchars($searcher['title']) ?></h3>
                     <p class="text-gray-600"><?= htmlspecialchars($searcher['location'] ?? 'Location not specified') ?>
                     </p>
@@ -216,6 +243,45 @@ function updateSelectedCategories() {
 
 // Initialize on page load
 updateSelectedCategories();
+
+// Handle trash icon clicks for admin deletion
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.trash-icon').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const type = this.dataset.type;
+            const id = this.dataset.id;
+
+            if (confirm(
+                    `Are you sure you want to delete this ${type === 'job' ? 'job' : 'job seeker profile'}?`
+                )) {
+                // Send delete request to server
+                fetch(`/api/delete.php`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            type: type,
+                            id: id
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the card from the DOM
+                            this.closest('.bg-white').remove();
+                        } else {
+                            alert('Error deleting: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting.');
+                    });
+            }
+        });
+    });
+});
 </script>
 
 </html>
