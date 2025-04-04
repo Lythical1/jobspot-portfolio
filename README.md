@@ -10,11 +10,11 @@ To set up and run the project locally:
 2. Make sure Docker is installed on your system
 3. For the first time setup, run:
    ```
-   docker compose --build
+   docker compose up --build (-d for detached)
    ```
 4. For subsequent runs, you can use:
    ```
-   docker compose up
+   docker compose up (-d for detached)
    ```
 
 ## Features
