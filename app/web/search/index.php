@@ -7,6 +7,35 @@ $selectedCategories = isset($_GET['categories']) ? $_GET['categories'] : [];
 require_once '../../core/jobs.php';
 require_once '../../core/job_searchers.php';
 
+// Handle deletion requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $id = $_POST['id'] ?? '';
+    $type = $_POST['type'] ?? '';
+    $success = false;
+    $message = '';
+
+    if ($role === 'admin') {
+        if ($type === 'job' && !empty($id)) {
+            $jobRepo = new JobRepository();
+            $success = $jobRepo->deleteJob($id);
+            $message = $success ? 'Job deleted successfully' : 'Failed to delete job';
+        } elseif ($type === 'seeker' && !empty($id)) {
+            $jobSearcherRepo = new JobSearcher();
+            $success = $jobSearcherRepo->deleteSearcher($id);
+            $message = $success ? 'Job seeker application deleted successfully' : 'Failed to delete job seeker application';
+        } else {
+            $message = 'Invalid deletion request';
+        }
+    } else {
+        $message = 'Unauthorized';
+    }
+
+    // Send JSON response for AJAX requests
+    header('Content-Type: application/json');
+    echo json_encode(['success' => $success, 'message' => $message]);
+    exit;
+}
+
 try {
     $jobRepo = new JobRepository();
     $jobSearcherRepo = new JobSearcher();
@@ -250,33 +279,43 @@ document.addEventListener('DOMContentLoaded', function() {
         icon.addEventListener('click', function() {
             const type = this.dataset.type;
             const id = this.dataset.id;
+            const cardElement = this.closest('.bg-white');
 
             if (confirm(
-                    `Are you sure you want to delete this ${type === 'job' ? 'job' : 'job seeker profile'}?`
-                )) {
-                // Send delete request to server
-                fetch(`/api/delete.php`, {
+                    `Are you sure you want to delete this ${type === 'job' ? 'job' : 'job seeker application'}?`
+                    )) {
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('type', type);
+                formData.append('id', id);
+
+                // Send the request to the current page which now handles deletion
+                fetch('index.php', {
                         method: 'POST',
+                        body: formData,
                         headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            type: type,
-                            id: id
-                        })
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             // Remove the card from the DOM
-                            this.closest('.bg-white').remove();
+                            cardElement.remove();
+                            // Show success message
+                            alert(data.message);
                         } else {
-                            alert('Error deleting: ' + data.message);
+                            alert('Error: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while deleting.');
+                        alert('An error occurred while deleting. Please try again.');
                     });
             }
         });

@@ -138,11 +138,35 @@ class JobRepository
         try {
             $pdo = Database::connectDb();
             
+            // Begin transaction to ensure all or nothing is deleted
+            $pdo->beginTransaction();
+            
+            $stmt = $pdo->prepare("DELETE FROM job_skills WHERE job_id = ?");
+            $stmt->execute([$jobId]);
+            
+            $stmt = $pdo->prepare("DELETE FROM applications WHERE job_id = ?");
+            $stmt->execute([$jobId]);
+            
+            $stmt = $pdo->prepare("DELETE FROM saved_jobs WHERE job_id = ?");
+            $stmt->execute([$jobId]);
+            
+            $stmt = $pdo->prepare("DELETE FROM interviews WHERE job_id = ?");
+            $stmt->execute([$jobId]);
+            
             $stmt = $pdo->prepare("DELETE FROM jobs WHERE id = ?");
             $stmt->execute([$jobId]);
             
-            return $stmt->rowCount() > 0;
+            $success = $stmt->rowCount() > 0;
+            
+            // Commit the transaction if everything was successful
+            $pdo->commit();
+            
+            return $success;
         } catch (PDOException $e) {
+            // Rollback the transaction if there's an error
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             error_log("Error deleting job: " . $e->getMessage());
             return false;
         }

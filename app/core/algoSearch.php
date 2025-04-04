@@ -35,10 +35,14 @@ class SearchHelper
 
         // Check each word in the first string against each word in the second string
         foreach ($words1 as $word1) {
-            if (strlen($word1) < 4) continue;
+            if (strlen($word1) < 4) {
+                continue;
+            }
             
             foreach ($words2 as $word2) {
-                if (strlen($word2) < 3) continue;
+                if (strlen($word2) < 3) {
+                    continue;
+                }
                 
                 // String containment check
                 // This checks if one word is a substring of the other

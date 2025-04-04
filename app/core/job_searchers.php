@@ -136,11 +136,22 @@ class JobSearcher
         try {
             $pdo = Database::connectDb();
             
+            // Begin transaction to ensure all or nothing is deleted
+            $pdo->beginTransaction();
+            
             $stmt = $pdo->prepare("DELETE FROM job_searchers WHERE id = ?");
             $stmt->execute([$searcherId]);
+            $success = $stmt->rowCount() > 0;
             
-            return $stmt->rowCount() > 0;
+            // Commit the transaction if successful
+            $pdo->commit();
+            
+            return $success;
         } catch (PDOException $e) {
+            // Rollback the transaction if there's an error
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             error_log("Error deleting job seeker: " . $e->getMessage());
             return false;
         }
