@@ -28,7 +28,7 @@ if ($_SESSION['user_role'] === 'company' || $_SESSION['user_role'] === 'admin') 
 if ($_SESSION['user_role'] === 'job_seeker' || $_SESSION['user_role'] === 'admin') {
     // Job seeker specific options
     $userSpecificOptions[] = [
-        'title' => 'Applications',
+        'title' => 'Job search',
         'icon' => 'fas fa-file-alt',
         'link' => 'applications'
     ];
