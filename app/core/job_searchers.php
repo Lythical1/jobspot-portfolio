@@ -84,10 +84,9 @@ class JobSearcher
 
             $data['salary_range'] = str_replace(',', '', $data['salary_range']);
             
-            // Add EUR prefix if not already present
-            if (strpos($data['salary_range'], 'EUR') !== 0) {
-                $data['salary_range'] = 'EUR' . $data['salary_range'];
-            }
+            // Format with commas
+            $cleanSalary = preg_replace('/[^0-9]/', '', $data['salary_range']);
+            $data['salary_range'] = 'EUR' . number_format((int)$cleanSalary);
         }
         
         $sql = 'INSERT INTO job_searchers (user_id, title, category_id, work_hours, location, salary_range) 
@@ -102,7 +101,13 @@ class JobSearcher
             $data['salary_range']
         ]);
         
-        return $pdo->lastInsertId();
+        // Get the UUID of the inserted record
+        $sql = 'SELECT id FROM job_searchers WHERE user_id = ? ORDER BY id DESC LIMIT 1';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$data['user_id']]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result['id'] ?? false;
     }
     
     public function getCategories()

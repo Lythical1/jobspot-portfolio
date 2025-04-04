@@ -83,7 +83,11 @@ class JobRepository
             WHERE jobs.company_id = ?
         ");
         $stmt->execute([$userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $searchHelper = new SearchHelper();
+
+        $formattedJobs = $searchHelper->formatSalaryRanges($stmt->fetchAll(PDO::FETCH_ASSOC));
+        return $formattedJobs;
     }
 
     public function createJobOffer($data)
@@ -99,10 +103,9 @@ class JobRepository
 
             $data['salary_range'] = str_replace(',', '', $data['salary_range']);
             
-            // Add EUR prefix if not already present
-            if (strpos($data['salary_range'], 'EUR') !== 0) {
-                $data['salary_range'] = 'EUR' . $data['salary_range'];
-            }
+            // Format with commas after every 3 digits
+            $cleanSalary = preg_replace('/[^0-9]/', '', $data['salary_range']);
+            $data['salary_range'] = 'EUR' . number_format((int)$cleanSalary);
         }
 
         $stmt = $pdo->prepare("
