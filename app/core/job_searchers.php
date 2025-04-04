@@ -57,4 +57,55 @@ class JobSearcher
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+
+    public function getUserApplications($userId)
+    {
+        $pdo = Database::connectDb();
+        $sql = 'SELECT * FROM job_searchers WHERE user_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$userId]);
+        $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $searchHelper = new SearchHelper();
+        $formattedApplications = $searchHelper->formatSalaryRanges($applications);
+        return $formattedApplications;
+    }
+
+    public function createApplication($data)
+    {
+        $pdo = Database::connectDb();
+        
+        // Clean salary: remove euro symbol if present
+        if (!empty($data['salary_range'])) {
+            // Remove € symbol if present
+            $data['salary_range'] = str_replace('€', '', $data['salary_range']);
+            
+            // Add EUR prefix if not already present
+            if (strpos($data['salary_range'], 'EUR') !== 0) {
+                $data['salary_range'] = 'EUR' . $data['salary_range'];
+            }
+        }
+        
+        $sql = 'INSERT INTO job_searchers (user_id, title, category_id, work_hours, location, salary_range) 
+                VALUES (?, ?, ?, ?, ?, ?)';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $data['user_id'],
+            $data['title'],
+            $data['category'],
+            $data['work_hours'],
+            $data['location'],
+            $data['salary_range']
+        ]);
+        
+        return $pdo->lastInsertId();
+    }
+    
+    public function getCategories()
+    {
+        $pdo = Database::connectDb();
+        $stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
