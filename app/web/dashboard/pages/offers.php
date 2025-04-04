@@ -111,22 +111,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_job'])) {
                         </div>
 
                         <div class="mb-4">
-                            <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary Range</label>
-                            <input type="text"
+                            <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary Range*</label>
+                            <input type="number"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                id="salary" name="salary" placeholder="e.g. €40,000 - €50,000">
+                                id="salary" name="salary" placeholder="e.g. €40,000 (euro is added automatically)" required>
                         </div>
 
                         <div class="mb-4">
-                            <label for="description" class="block text-gray-700 text-sm font-semibold mb-2">Job Description</label>
+                            <label for="description" class="block text-gray-700 text-sm font-semibold mb-2">Job Description*</label>
                             <textarea
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                id="description" name="description" rows="4"></textarea>
+                                id="description" name="description" rows="4" required></textarea>
                         </div>
 
                         <div class="mt-6">
                             <button type="submit" name="submit_job"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Post
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300
+                                ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Post
                                 Job</button>
                         </div>
                     </form>
@@ -148,7 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_job'])) {
                             <div class="flex justify-between items-start">
                                 <h3 class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($job['title']); ?></h3>
                                 <div>
-                                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-2">Edit</button>
                                     <button class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
                                 </div>
                             </div>

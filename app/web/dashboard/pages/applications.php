@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
             'location' => $location,
             'salary_range' => $salary_range
         ]);
+
         
         if ($result) {
             $message = '<div class="alert alert-success">Your application has been successfully created!</div>';
@@ -73,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
 
                         <div class="mb-4">
                             <label for="category"
-                                class="block text-gray-700 text-sm font-semibold mb-2">Category</label>
+                                class="block text-gray-700 text-sm font-semibold mb-2">Category*</label>
                             <select
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-                                id="category" name="category">
+                                id="category" name="category" required>
                                 <option value="" selected disabled>Choose a category...</option>
                                 <?php foreach ($categories as $category) : ?>
                                 <option value="<?php echo $category['id']; ?>">
@@ -87,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
 
                         <div class="mb-4">
                             <label for="work_hours" class="block text-gray-700 text-sm font-semibold mb-2">Work
-                                Hours</label>
+                                Hours*</label>
                             <select
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-                                id="work_hours" name="work_hours">
+                                id="work_hours" name="work_hours" required>
                                 <option value="full_time">Full Time</option>
                                 <option value="part_time">Part Time</option>
                                 <option value="contract">Contract</option>
@@ -100,23 +101,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
 
                         <div class="mb-4">
                             <label for="location"
-                                class="block text-gray-700 text-sm font-semibold mb-2">Location</label>
+                                class="block text-gray-700 text-sm font-semibold mb-2">Location*</label>
                             <input type="text"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                id="location" name="location">
+                                id="location" name="location" required>
                         </div>
 
                         <div class="mb-4">
                             <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary
-                                Expectation</label>
-                            <input type="text"
+                                Expectation*</label>
+                            <input type="number"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                id="salary" name="salary" placeholder="e.g. €40,000">
+                                id="salary" name="salary" placeholder="e.g. €40,000 (euro is added automatically)" required>
                         </div>
 
                         <div class="mt-6">
                             <button type="submit" name="submit_application"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Create
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300
+                                ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Create
                                 Application</button>
                         </div>
                     </form>
@@ -135,8 +137,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                     <div class="divide-y divide-gray-200">
                         <?php foreach ($applications as $app) : ?>
                         <div class="py-4">
-                            <h3 class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($app['title']); ?>
-                            </h3>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($app['title']); ?></h3>
+                                <div>
+                                    <button class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+                                </div>
+                            </div>
                             <div class="mt-2 flex flex-wrap gap-2">
                                 <?php if (!empty($app['category_name'])) : ?>
                                 <span
