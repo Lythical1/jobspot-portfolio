@@ -1,3 +1,10 @@
+<?php
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <nav class="bg-gray-800">
     <div class="max-w-full mx-auto px-8">
