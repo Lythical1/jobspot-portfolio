@@ -63,3 +63,8 @@ The application includes comprehensive mock data to demonstrate functionality, i
 - Skills, applications, and interviews
 
 See `database/mock_data.sql` for the complete dataset.
+
+
+## Precaution
+
+In some cases there can be an error while uploading a profile picture, please make sure the correct premissions are given with the folder so everyone can view and edit the `profiles` folder.
