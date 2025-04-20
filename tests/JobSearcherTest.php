@@ -48,11 +48,11 @@ class JobSearcherTest extends TestCase
             ->method('prepare')
             ->willReturn($mockStatement);
         
-        // Call the method being tested
-        $result = $this->jobSearcher->getSearchers();
+        // Call the method being tested with empty query
+        $result = $this->jobSearcher->getSearchers('');
         
         // Verify the results
-        $this->assertEquals($expectedSearchers, $result);
+        $this->assertEquals(['searchers' => $expectedSearchers], $result);
     }
     
     public function testFilterSearchersWithMultipleFilters()
